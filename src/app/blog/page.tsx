@@ -89,19 +89,15 @@ export default function BlogPage() {
       <section className={styles.subscribe} aria-labelledby="subscribe-title">
         <div>
           <p className="eyebrow">03 / KEEP UP</p>
-          <h2 id="subscribe-title">Get the useful stuff.<br /><span>Skip the noise.</span></h2>
+          <h2 id="subscribe-title">Keep an eye on the journal.<br /><span>New work lands here.</span></h2>
         </div>
-        <form className={styles.form} action="#" method="post">
-          <label htmlFor="blog-email">Email address</label>
-          <div>
-            <input id="blog-email" name="email" type="email" placeholder="you@example.com" autoComplete="email" required />
-            <button type="submit">Subscribe ↗</button>
-          </div>
-          <small>Optional marketing updates. Manage your choices at any time.</small>
-        </form>
+        <div className={styles.cardBody}>
+          <p>Veyra will use this journal for product announcements, creator resources, release notes, and deeper thinking about the platform.</p>
+          <Link className={styles.textLink} href="/">Explore Veyra <span>↗</span></Link>
+        </div>
       </section>
 
-      <footer className={`${styles.footer}`}>
+      <footer className={styles.footer}>
         <span>© {new Date().getFullYear()} Veyra</span>
         <Link href="/">Back to Veyra</Link>
         <span>Powered by Timzee Corp</span>
