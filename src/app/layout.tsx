@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +22,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <ConsentBanner />
+      </body>
     </html>
   );
 }
