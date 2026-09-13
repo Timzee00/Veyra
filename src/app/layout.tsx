@@ -3,6 +3,7 @@ import "./globals.css";
 import "./home.css";
 import "./auth.css";
 import "./dashboard.css";
+import "./public-creator.css";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 
 export const metadata: Metadata = {
@@ -10,17 +11,12 @@ export const metadata: Metadata = {
     default: "Veyra — Your work, unmistakably yours.",
     template: "%s — Veyra",
   },
-  description:
-    "Veyra is a premium portfolio platform for creators to publish, grow, and get discovered.",
+  description: "Veyra is a premium portfolio platform for creators to publish, grow, and get discovered.",
   applicationName: "Veyra",
   generator: "Next.js",
   robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en">
-      <body>{children}<ConsentBanner /></body>
-    </html>
-  );
+  return <html lang="en"><body>{children}<ConsentBanner /></body></html>;
 }
