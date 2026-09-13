@@ -44,6 +44,18 @@ create table public.creator_sites (
   updated_at timestamptz not null default now()
 );
 
+-- Stable template catalog. Individual releases live in template_versions.
+create table public.templates (
+  id text primary key,
+  name text not null,
+  slug text not null unique,
+  description text,
+  tier text not null default 'free' check (tier in ('free','pro','studio','custom')),
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table public.features (
   id text primary key,
   name text not null,
