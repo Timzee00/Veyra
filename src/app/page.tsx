@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const stats = [
   { value: "∞", label: "Ways to present your work" },
   { value: "01", label: "Portfolio, built around you" },
@@ -46,6 +48,7 @@ export default function Home() {
           <a href="#platform">Platform</a>
           <a href="#templates">Templates</a>
           <a href="#creators">Creators</a>
+          <Link href="/blog">Blog</Link>
           <a href="#pricing">Pricing</a>
         </div>
         <a className="nav-cta" href="#get-started">Start creating</a>
@@ -54,10 +57,7 @@ export default function Home() {
       <section className="hero" id="top">
         <div className="hero-copy">
           <p className="eyebrow">THE CREATIVE PORTFOLIO PLATFORM</p>
-          <h1>
-            Your work,
-            <span> unmistakably yours.</span>
-          </h1>
+          <h1>Your work,<span> unmistakably yours.</span></h1>
           <p className="hero-text">
             Veyra gives modern creators a premium place to publish projects,
             tell stories, build reputation and turn attention into opportunity.
@@ -162,8 +162,21 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="blog-spotlight" aria-labelledby="blog-spotlight-title">
+        <div>
+          <p className="eyebrow">04 / VEYRA JOURNAL</p>
+          <h2 id="blog-spotlight-title">What we are building,<br /><span>and why.</span></h2>
+          <p>Product updates, creator notes, design thinking and the engineering decisions behind Veyra.</p>
+        </div>
+        <div className="blog-spotlight-card">
+          <span>Latest story</span>
+          <strong>Why Veyra exists: creative work deserves a better home.</strong>
+          <Link className="text-link" href="/blog/why-veyra-exists">Read the journal <span>↗</span></Link>
+        </div>
+      </section>
+
       <section className="closing" id="pricing">
-        <p className="eyebrow">04 / NEXT</p>
+        <p className="eyebrow">05 / NEXT</p>
         <h2>Build your world.<br /><span>Then make it bigger.</span></h2>
         <a className="button button-primary" href="#top">Enter Veyra <span>↗</span></a>
         <p className="powered">Powered by Timzee Corp</p>
@@ -171,7 +184,7 @@ export default function Home() {
 
       <footer className="footer">
         <span>© {new Date().getFullYear()} Veyra</span>
-        <span>Independent creator infrastructure</span>
+        <span><Link href="/blog">Journal</Link> · Independent creator infrastructure</span>
         <span>Powered by Timzee Corp</span>
       </footer>
     </main>
