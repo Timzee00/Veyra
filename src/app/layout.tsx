@@ -3,6 +3,7 @@ import "./globals.css";
 import "./home.css";
 import "./auth.css";
 import "./dashboard.css";
+import "./dashboard-media.css";
 import "./public-creator.css";
 import "./public-project.css";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
