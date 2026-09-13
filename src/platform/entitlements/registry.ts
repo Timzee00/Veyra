@@ -5,6 +5,12 @@ export const FEATURE_IDS = {
   ADVANCED_ANALYTICS: "advanced_analytics",
   CUSTOM_DOMAIN: "custom_domain",
   CUSTOM_BRANDING: "custom_branding",
+  PLATFORM_BRANDING_REMOVAL: "platform_branding_removal",
+  DESIGN_CUSTOMIZATION: "design_customization",
+  ADVANCED_CUSTOMIZATION: "advanced_customization",
+  CAMPAIGN_BENEFITS: "campaign_benefits",
+  AI_TEMPLATE_BUILDER: "ai_template_builder",
+  AI_TEMPLATE_PUBLISH: "ai_template_publish",
   TEAM_MEMBERS: "team_members",
   API_ACCESS: "api_access",
   PRIORITY_SUPPORT: "priority_support",
@@ -18,11 +24,8 @@ export type EntitlementValue = {
   value?: Record<string, unknown> | null;
 };
 
-/**
- * Product code should ask for capabilities, never for plan names.
- * Resolution will later combine plan, add-ons, promotions and admin grants.
- */
 export interface EntitlementResolver {
   canUse(feature: FeatureId): Promise<boolean>;
   limit(feature: FeatureId): Promise<number | null>;
+  value(feature: FeatureId): Promise<Record<string, unknown> | null>;
 }
