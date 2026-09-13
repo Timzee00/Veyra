@@ -8,6 +8,7 @@ import "./public-creator.css";
 import "./public-project.css";
 import "./public-project-media.css";
 import "./public-creator-media.css";
+import "./portfolio-renderer.css";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 
 export const metadata: Metadata = {
