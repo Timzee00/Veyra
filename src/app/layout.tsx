@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./home.css";
 import "./discovery.css";
+import "./creator-landing.css";
+import "./explore.css";
 import "./auth.css";
 import "./dashboard.css";
 import "./dashboard-media.css";
