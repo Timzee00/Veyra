@@ -29,6 +29,17 @@ export type VeyraEventMap = {
     choice: string;
     policyVersion: string;
   };
+  "ai.plugin.executed": {
+    pluginId: string;
+    capability: string;
+    creatorId?: string;
+    success: boolean;
+  };
+  "ai.template.generated": {
+    creatorId: string;
+    pluginId: string;
+    templateVersionId?: string;
+  };
 };
 
 export type VeyraEventName = keyof VeyraEventMap;
