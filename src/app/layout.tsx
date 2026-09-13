@@ -6,6 +6,7 @@ import "./dashboard.css";
 import "./dashboard-media.css";
 import "./public-creator.css";
 import "./public-project.css";
+import "./public-project-media.css";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 
 export const metadata: Metadata = {
