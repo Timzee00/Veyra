@@ -1,10 +1,10 @@
--- Veyra: campaigns, durable entitlement grants, template versions, and contextual notices
--- This migration is intentionally additive and keeps campaign lifecycle separate
--- from the lifetime of benefits granted by a campaign.
+-- Veyra: campaigns, durable entitlement grants, template versions, and contextual notices.
+-- Campaign lifecycle is deliberately separate from the lifetime of benefits granted by a campaign.
+-- This migration targets the canonical Veyra creator table: public.creator_accounts.
 
 create table if not exists public.template_versions (
   id uuid primary key default gen_random_uuid(),
-  template_id uuid not null references public.templates(id) on delete restrict,
+  template_id text not null references public.templates(id) on delete restrict,
   version text not null,
   status text not null default 'active' check (status in ('draft','active','deprecated','maintenance','blocked')),
   definition jsonb not null default '{}'::jsonb,
@@ -45,7 +45,7 @@ create index if not exists idx_campaigns_status_dates
 create table if not exists public.campaign_benefits (
   id uuid primary key default gen_random_uuid(),
   campaign_id uuid not null references public.campaigns(id) on delete cascade,
-  feature_id uuid references public.features(id) on delete restrict,
+  feature_id text references public.features(id) on delete restrict,
   template_version_id uuid references public.template_versions(id) on delete restrict,
   entitlement_key text,
   value jsonb not null default '{}'::jsonb,
@@ -64,7 +64,7 @@ create index if not exists idx_campaign_benefits_campaign
 create table if not exists public.campaign_claims (
   id uuid primary key default gen_random_uuid(),
   campaign_id uuid not null references public.campaigns(id) on delete restrict,
-  creator_id uuid not null references public.creators(id) on delete cascade,
+  creator_id uuid not null references public.creator_accounts(id) on delete cascade,
   claimed_at timestamptz not null default now(),
   source_metadata jsonb not null default '{}'::jsonb,
   unique (campaign_id, creator_id)
@@ -73,11 +73,10 @@ create table if not exists public.campaign_claims (
 create index if not exists idx_campaign_claims_creator
   on public.campaign_claims(creator_id, claimed_at desc);
 
--- Durable benefit grants are independent from campaign lifecycle.
 create table if not exists public.entitlement_grants (
   id uuid primary key default gen_random_uuid(),
-  creator_id uuid not null references public.creators(id) on delete cascade,
-  feature_id uuid references public.features(id) on delete restrict,
+  creator_id uuid not null references public.creator_accounts(id) on delete cascade,
+  feature_id text references public.features(id) on delete restrict,
   template_version_id uuid references public.template_versions(id) on delete restrict,
   campaign_id uuid references public.campaigns(id) on delete set null,
   campaign_benefit_id uuid references public.campaign_benefits(id) on delete set null,
@@ -98,7 +97,6 @@ create index if not exists idx_entitlement_grants_creator_active
 create index if not exists idx_entitlement_grants_template_version
   on public.entitlement_grants(template_version_id);
 
--- Contextual notices: banners, modal announcements, prompts, and in-product guidance.
 create table if not exists public.notices (
   id uuid primary key default gen_random_uuid(),
   key text not null unique,
@@ -131,7 +129,7 @@ create index if not exists idx_notices_active_window
 create table if not exists public.notice_interactions (
   id uuid primary key default gen_random_uuid(),
   notice_id uuid not null references public.notices(id) on delete cascade,
-  creator_id uuid references public.creators(id) on delete cascade,
+  creator_id uuid references public.creator_accounts(id) on delete cascade,
   visitor_id text,
   interaction text not null check (interaction in ('impression','dismissed','clicked','converted')),
   metadata jsonb not null default '{}'::jsonb,
@@ -144,7 +142,6 @@ create index if not exists idx_notice_interactions_notice_time
 create index if not exists idx_notice_interactions_actor_time
   on public.notice_interactions(creator_id, visitor_id, created_at desc);
 
--- RLS is enabled now; policies can be tightened alongside the existing project policies.
 alter table public.template_versions enable row level security;
 alter table public.campaigns enable row level security;
 alter table public.campaign_benefits enable row level security;
@@ -153,14 +150,10 @@ alter table public.entitlement_grants enable row level security;
 alter table public.notices enable row level security;
 alter table public.notice_interactions enable row level security;
 
--- Public rendering needs published template definitions, but mutations remain server/admin controlled.
-drop policy if exists "public can read active template versions" on public.template_versions;
 create policy "public can read active template versions"
   on public.template_versions for select
   using (status in ('active','deprecated','maintenance'));
 
--- Public users can read active public-facing notices. Audience/entitlement checks happen in the application layer.
-drop policy if exists "public can read active notices" on public.notices;
 create policy "public can read active notices"
   on public.notices for select
   using (
@@ -169,34 +162,14 @@ create policy "public can read active notices"
     and (ends_at is null or ends_at > now())
   );
 
--- Creators can read their own durable grants and claims; write paths are server-side.
-drop policy if exists "creators can read own entitlement grants" on public.entitlement_grants;
 create policy "creators can read own entitlement grants"
   on public.entitlement_grants for select
-  using (
-    exists (
-      select 1 from public.creators c
-      where c.id = creator_id and c.user_id = auth.uid()
-    )
-  );
+  using (app.current_user_has_creator_access(creator_id));
 
-drop policy if exists "creators can read own campaign claims" on public.campaign_claims;
 create policy "creators can read own campaign claims"
   on public.campaign_claims for select
-  using (
-    exists (
-      select 1 from public.creators c
-      where c.id = creator_id and c.user_id = auth.uid()
-    )
-  );
+  using (app.current_user_has_creator_access(creator_id));
 
--- Creators can read their own notice interactions; public impression writes should use a server endpoint.
-drop policy if exists "creators can read own notice interactions" on public.notice_interactions;
 create policy "creators can read own notice interactions"
   on public.notice_interactions for select
-  using (
-    exists (
-      select 1 from public.creators c
-      where c.id = creator_id and c.user_id = auth.uid()
-    )
-  );
+  using (app.current_user_has_creator_access(creator_id));
