@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getBuiltInTemplate } from "@/platform/templates/catalog";
 import PortfolioRenderer from "@/components/portfolio/PortfolioRenderer";
 
@@ -31,12 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
       siteName: "Veyra",
       images: [{ url: path, width: 1200, height: 630, alt: `${title} — portfolio on Veyra` }],
     },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [path],
-    },
+    twitter: { card: "summary_large_image", title, description, images: [path] },
   };
 }
 
@@ -45,7 +41,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
   const supabase = await createSupabaseServerClient();
   const { data: creator } = await supabase
     .from("creator_accounts")
-    .select("id, handle, display_name, bio, website_url, whatsapp_number, default_inquiry_message")
+    .select("id, handle, display_name, bio, website_url, whatsapp_number, default_inquiry_message, avatar_path, category, location")
     .eq("handle", handle.toLowerCase())
     .maybeSingle();
   if (!creator) notFound();
@@ -69,26 +65,18 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
 
   const projectIds = (projects ?? []).map((project) => project.id);
   const { data: media } = projectIds.length
-    ? await supabase
-        .from("project_media")
-        .select("project_id, storage_path, media_role, position")
-        .in("project_id", projectIds)
-        .order("position", { ascending: true })
+    ? await supabase.from("project_media").select("project_id, storage_path, media_role, position").in("project_id", projectIds).order("position", { ascending: true })
     : { data: [] as Array<{ project_id: string; storage_path: string; media_role: string; position: number }> };
 
   const coverCandidates = (media ?? []).filter((item) => item.media_role === "cover");
+  const admin = createSupabaseAdminClient();
   const { data: signed } = coverCandidates.length
-    ? await supabase.storage
-        .from("project-media")
-        .createSignedUrls(coverCandidates.map((item) => item.storage_path), 3600)
+    ? await admin.storage.from("project-media").createSignedUrls(coverCandidates.map((item) => item.storage_path), 3600)
     : { data: [] as Array<{ path: string; signedUrl: string | null }> };
   const signedByPath = new Map((signed ?? []).map((item) => [item.path, item.signedUrl]));
   const coverByProject = new Map(coverCandidates.map((item) => [item.project_id, signedByPath.get(item.storage_path) ?? null]));
 
-  const projectsWithCovers = (projects ?? []).map((project) => ({
-    ...project,
-    coverUrl: coverByProject.get(project.id) ?? null,
-  }));
+  const projectsWithCovers = (projects ?? []).map((project) => ({ ...project, coverUrl: coverByProject.get(project.id) ?? null }));
 
   return <PortfolioRenderer creator={creator} site={site} projects={projectsWithCovers} definition={template.definition} />;
 }
