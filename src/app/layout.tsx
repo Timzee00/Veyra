@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./home.css";
+import "./auth.css";
 import { ConsentBanner } from "@/components/privacy/ConsentBanner";
 
 export const metadata: Metadata = {
