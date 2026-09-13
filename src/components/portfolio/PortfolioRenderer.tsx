@@ -34,6 +34,15 @@ function buildWhatsAppUrl(creator: Creator) {
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
 
+function creatorInitials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("") || "V";
+}
+
 export default function PortfolioRenderer({
   creator,
   site,
@@ -48,14 +57,32 @@ export default function PortfolioRenderer({
   const sections = getRendererSections(definition);
   const whatsappUrl = buildWhatsAppUrl(creator);
   const featured = projects[0];
+  const initials = creatorInitials(creator.display_name);
+  const pageTitle = site.title?.trim() || creator.display_name;
 
   return (
     <main className={`portfolio-shell template-${site.template_id}`}>
       <header className="portfolio-nav">
-        <Link className="brand" href="/" aria-label="Veyra home"><span className="brand-mark">V</span><span>VEYRA</span></Link>
-        <div className="portfolio-nav-name">{creator.display_name}</div>
-        <Link className="portfolio-contact" href={whatsappUrl ?? "#work"} target={whatsappUrl ? "_blank" : undefined}>Start a project ↗</Link>
+        <Link className="creator-brand" href="#top" aria-label={`${creator.display_name} home`}>
+          <span className="creator-brand-mark">{initials}</span>
+          <span className="creator-brand-name">{creator.display_name}</span>
+        </Link>
+
+        <Link className="portfolio-platform-link" href="/" aria-label="Discover more creators on Veyra">
+          <span>V</span> Discover on Veyra
+        </Link>
+
+        <div className="portfolio-nav-actions">
+          <a className="portfolio-nav-work" href="#work">Work</a>
+          {whatsappUrl ? (
+            <a className="portfolio-contact" href={whatsappUrl} target="_blank" rel="noreferrer">Start a project ↗</a>
+          ) : (
+            <a className="portfolio-contact" href="#contact">Contact</a>
+          )}
+        </div>
       </header>
+
+      <div id="top" className="portfolio-page-title" aria-hidden="true">{pageTitle}</div>
 
       {sections.map((section, index) => {
         const key = `${section.type}-${index}`;
@@ -67,13 +94,14 @@ export default function PortfolioRenderer({
                 <h1>{creator.display_name}</h1>
                 <p>{creator.bio || "A creator building thoughtful work."}</p>
                 {whatsappUrl && <a className="button button-primary" href={whatsappUrl} target="_blank" rel="noreferrer">Start a project ↗</a>}
+                {creator.website_url && <a className="portfolio-secondary-link" href={creator.website_url} target="_blank" rel="noreferrer">Visit website ↗</a>}
               </section>
             );
           case "featured_project":
             return featured ? (
               <section className={`portfolio-featured featured-${section.variant ?? "default"}`} key={key}>
                 <div className="portfolio-featured-copy"><p className="eyebrow">FEATURED WORK</p><h2>{featured.title}</h2><p>{featured.summary}</p><Link href={`/creator/${creator.handle}/project/${featured.slug}`}>View project ↗</Link></div>
-                {featured.coverUrl && <img src={featured.coverUrl} alt="" />}
+                {featured.coverUrl ? <img src={featured.coverUrl} alt="" /> : <div className="portfolio-featured-placeholder" aria-hidden="true" />}
               </section>
             ) : null;
           case "projects":
@@ -83,7 +111,7 @@ export default function PortfolioRenderer({
                 <div className="portfolio-project-grid">
                   {projects.map((project) => (
                     <article className="portfolio-project" key={project.id}>
-                      {project.coverUrl ? <img src={project.coverUrl} alt="" /> : <div className="portfolio-project-placeholder" aria-hidden="true"><span>VEYRA</span></div>}
+                      {project.coverUrl ? <img src={project.coverUrl} alt="" loading="lazy" /> : <div className="portfolio-project-placeholder" aria-hidden="true"><span>NO COVER</span></div>}
                       <div><span>{new Date(project.published_at ?? Date.now()).getFullYear()}</span><h3>{project.title}</h3><p>{project.summary}</p><Link href={`/creator/${creator.handle}/project/${project.slug}`}>View project ↗</Link></div>
                     </article>
                   ))}
@@ -93,8 +121,15 @@ export default function PortfolioRenderer({
           case "about":
             return (
               <section className={`portfolio-about about-${section.variant ?? "split"}`} key={key}>
-                <p className="eyebrow">ABOUT</p><h2>{creator.bio || "Thoughtful creative work, presented with clarity."}</h2>
-                {creator.website_url && <a href={creator.website_url} target="_blank" rel="noreferrer">Visit website ↗</a>}
+                <div>
+                  <p className="eyebrow">ABOUT</p>
+                  <h2>{creator.bio || "Thoughtful creative work, presented with clarity."}</h2>
+                </div>
+                <div className="portfolio-about-side">
+                  <span>Creator</span>
+                  <strong>{creator.display_name}</strong>
+                  {creator.website_url && <a href={creator.website_url} target="_blank" rel="noreferrer">Visit website ↗</a>}
+                </div>
               </section>
             );
           case "services":
@@ -105,7 +140,7 @@ export default function PortfolioRenderer({
             );
           case "contact":
             return (
-              <section className={`portfolio-contact-section contact-${section.variant ?? "simple"}`} key={key}>
+              <section id="contact" className={`portfolio-contact-section contact-${section.variant ?? "simple"}`} key={key}>
                 <p className="eyebrow">LET'S WORK TOGETHER</p><h2>Have a project in mind?</h2>
                 {whatsappUrl && <a className="button button-primary" href={whatsappUrl} target="_blank" rel="noreferrer">Talk on WhatsApp ↗</a>}
               </section>
@@ -115,7 +150,11 @@ export default function PortfolioRenderer({
         }
       })}
 
-      <footer className="public-creator-footer"><span>© {new Date().getFullYear()} {creator.display_name}</span><span>Built with Veyra</span><span>Powered by Timzee Corp</span></footer>
+      <footer className="public-creator-footer">
+        <span>© {new Date().getFullYear()} {creator.display_name}</span>
+        <Link href="/">Discover creators on Veyra</Link>
+        <span>Powered by Timzee Corp</span>
+      </footer>
     </main>
   );
 }
