@@ -40,7 +40,7 @@ export function createPageBlock(type: PageBlockKind): PageBlock {
     paragraph: { text: "Write something helpful for your visitors." },
     button: { text: "Learn more", url: "/" },
     divider: {},
-    image: { url: "https://placehold.co/1200x760/png?text=Replace+this+image", alt: "Temporary image placeholder" },
+    image: { url: "/site-editor-placeholder.svg", alt: "Temporary image placeholder" },
     quote: { text: "Add a genuine quote from a customer or collaborator." },
     faq: { question: "A question your visitors ask", answer: "Give a clear, useful answer." },
     spacer: {},
