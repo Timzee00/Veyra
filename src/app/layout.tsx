@@ -8,6 +8,7 @@ import "./auth.css";
 import "./dashboard.css";
 import "./dashboard-media.css";
 import "./template-picker.css";
+import "./page-studio.css";
 import "./public-creator.css";
 import "./public-project.css";
 import "./public-project-media.css";
