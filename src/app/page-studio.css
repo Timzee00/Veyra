@@ -1,0 +1,87 @@
+/* Multi-page Veyra Studio: responsive three-panel workspace, accessible controls, and public rendering. */
+.vstudio-page-shell{min-height:100vh;background:#090b11;color:#f2f2f5}
+.vstudio-site-nav{height:62px;border-bottom:1px solid #ffffff1a;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(15px,3vw,36px);gap:18px}
+.vstudio-site-nav a{font-size:12px;color:#d3cbe4}.vstudio-site-brand{font-weight:800;letter-spacing:.17em}.vstudio-site-nav span{font-size:10px;color:#9b92aa}
+.vstudio{max-width:1920px;margin:0 auto;padding:clamp(18px,3vw,38px)}
+.vstudio-top{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;flex-wrap:wrap;padding-bottom:27px;border-bottom:1px solid #ffffff19}
+.vstudio-top h1{font-size:clamp(35px,5vw,65px);line-height:1.05;letter-spacing:-.06em;margin:9px 0}
+.vstudio-subtitle{color:#aaa6b5;font-size:13px;line-height:1.65;max-width:600px}
+.vstudio-commands{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vstudio-commands span{color:#bcb4ce;font-size:11px;margin-right:7px}.vstudio button,.vpage-new-form button{cursor:pointer;font:inherit;font-size:12px;border:1px solid #ffffff2c;border-radius:9px;background:#222638;color:#f4effb;padding:10px 13px;transition:background .17s,transform .17s}
+.vstudio button:hover:not(:disabled),.vpage-new-form button:hover:not(:disabled){background:#39344e}
+.vstudio button:focus-visible,.vstudio input:focus-visible,.vstudio textarea:focus-visible,.vpage-new-form input:focus-visible{outline:3px solid #9bdaff;outline-offset:2px}
+.vstudio button:disabled,.vpage-new-form button:disabled{opacity:.45;cursor:not-allowed}
+.vstudio button.vstudio-publish,.vpage-new-form button{background:#d6c4ff;color:#20152f;font-weight:800;border-color:transparent}
+.vstudio-alert{padding:14px 18px;margin:20px 0;background:#9d752c2a;border:1px solid #b08a3b70;border-radius:12px;color:#efcda2;font-size:12px}
+.vstudio-metadata{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin:20px 0}
+.vstudio-metadata label,.vstudio-inspector label{display:grid;gap:8px;color:#c2bad1;font-size:12px;font-weight:650}
+.vstudio-metadata label>span{color:#a8a0bb;font-size:10px}
+.vstudio-metadata input,.vstudio-inspector input,.vstudio-inspector textarea{width:100%;min-width:0;border:1px solid #ffffff29;background:#181d2d;color:#fff;border-radius:9px;padding:12px;font:inherit;font-size:13px;outline:none}
+.vstudio-workspace{display:grid;grid-template-columns:minmax(180px,220px) minmax(0,1fr) minmax(190px,250px);gap:14px;align-items:start}
+.vstudio-library,.vstudio-inspector{padding:18px;border:1px solid #ffffff1b;background:#111622;border-radius:16px;min-width:0;display:grid;gap:12px}
+.vstudio-library h2,.vstudio-inspector h2{font-size:17px;letter-spacing:-.03em;margin:7px 0 5px}
+.vstudio-element-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.vstudio-element-grid button{font-size:11px;padding:10px 7px;text-align:left}
+.vstudio-kit{display:grid;gap:4px;text-align:left}.vstudio-kit strong{font-size:12px}.vstudio-kit small{color:#beb5d0;font-size:10px;line-height:1.4}
+.vstudio-library>p,.vstudio-inspector>p{color:#a9a0b9;font-size:11px;line-height:1.65}
+.vstudio-canvas{background:#111521;border:1px solid #ffffff1f;padding:17px;border-radius:16px;min-width:0}
+.vstudio-canvas-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.vstudio-canvas-toolbar>span{font-size:10px;letter-spacing:.13em;color:#c8b7ea;font-weight:750}
+.vstudio-canvas-toolbar>div{display:flex;gap:5px}
+.vstudio-canvas-toolbar button{padding:8px 11px}
+.vstudio-canvas-toolbar button[aria-pressed=true]{background:#d6c4ff;color:#20152f}
+.vstudio-viewport{min-width:0;border-radius:12px;overflow-x:auto;background:repeating-linear-gradient(45deg,#242635,#242635 12px,#202230 12px,#202230 24px);padding:17px}
+.vstudio-preview-paper{width:100%;max-width:880px;margin:auto;min-height:420px;background:#fbfaf6;color:#1d1b22;box-shadow:0 20px 55px #0007;transition:max-width .2s}
+.vstudio-viewport.viewport-tablet .vstudio-preview-paper{max-width:600px}.vstudio-viewport.viewport-mobile .vstudio-preview-paper{max-width:350px}
+.vstudio-preview-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:19px 25px;border-bottom:1px solid #00000020;font-size:11px}
+.vstudio-preview-nav strong{font-size:13px;overflow-wrap:anywhere}.vstudio-preview-nav span{font-size:10px;color:#696476}
+.vstudio-preview-paper footer{font-size:10px;color:#6b637b;padding:20px 25px;border-top:1px solid #00000019}
+.vstudio-hint{color:#b3abc4;font-size:10px;line-height:1.65;margin:15px 0}
+.vstudio-start{padding:60px 25px;color:#373041}.vstudio-start h2{font-size:30px;letter-spacing:-.04em}.vstudio-start p{color:#5d566a;line-height:1.6}
+.vstudio-layer-heading{margin:35px 0 10px}.vstudio-layer-heading h2{font-size:19px;margin:0 0 8px}.vstudio-layer-heading p{font-size:11px;color:#aca5bc;line-height:1.6}
+.vstudio-layers{list-style:none;display:grid;gap:7px;padding:0;margin:16px 0}
+.vstudio-layers li{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #ffffff22;border-radius:10px;padding:7px;flex-wrap:wrap}
+.vstudio-layers li.selected{border-color:#c3a9ef;background:#cbb2ff13}
+.vstudio-layers li>div{display:flex;gap:4px;flex-wrap:wrap}.vstudio-layers li>div button{padding:6px 8px;font-size:11px}
+.vstudio-layer-select{text-transform:capitalize}.vstudio-inspector .vstudio-selection{font-size:12px;color:#cabbdf;text-transform:capitalize;margin:0}
+.vstudio-inspector label{font-weight:500}.vstudio-inspector textarea{min-height:95px;resize:vertical;line-height:1.5}
+.vstudio-guidance{margin-top:15px;padding-top:14px;border-top:1px solid #ffffff20}
+.vstudio-guidance h3{font-size:14px;margin:0 0 10px}.vstudio-guidance p{font-size:11px;line-height:1.7;color:#b1a6c1}
+.vstudio-guidance .vstudio-issue{color:#f0c694}
+.vstudio-footer-actions{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:22px 0;color:#c9b8eb;font-size:12px}
+.vstudio-footer-actions button{font-size:11px}.vstudio-footer-actions a{text-decoration:underline;text-underline-offset:3px}
+.vpage-studio-intro{padding:30px 0}.vpage-studio-intro h2{font-size:clamp(24px,3vw,40px);letter-spacing:-.05em;margin:0 0 12px}.vpage-studio-intro p{font-size:13px;color:#aaa3b5;line-height:1.7;max-width:720px}
+.vpage-new-form{border:1px solid #ffffff20;background:#111421;border-radius:17px;padding:22px;display:grid;gap:12px}
+.vpage-new-form label{font-size:12px;color:#d8cde7;font-weight:750}.vpage-new-form>div{display:flex;gap:10px}.vpage-new-form input{flex:1;min-width:0;background:#1b2030;border:1px solid #ffffff2d;border-radius:9px;color:#fff;padding:14px;font:inherit}
+.vpage-new-form small{color:#ada6b8;font-size:11px}.vpage-list-heading{display:flex;justify-content:space-between;align-items:center;margin:35px 0 14px}
+.vpage-list-heading h2{font-size:26px;letter-spacing:-.04em}.vpage-list-heading span{color:#aba1b9;font-size:11px}
+.vpage-page-list{display:grid;gap:10px}.vpage-page-card{display:flex;justify-content:space-between;gap:20px;align-items:center;border:1px solid #ffffff20;border-radius:15px;padding:20px;background:#121622}
+.vpage-page-card h3{font-size:21px;margin:9px 0}.vpage-page-card p:last-child{font-size:12px;color:#aca4b9;overflow-wrap:anywhere}
+.vpage-page-actions{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;color:#dbcaf8}.vpage-studio-note{font-size:11px;color:#aaa0b8;margin-top:25px;line-height:1.6}
+.vpage-empty{border:1px dashed #ffffff40;border-radius:15px;padding:38px 22px}.vpage-empty h3{font-size:22px}.vpage-empty p{font-size:12px;color:#aaa2b6}
+/* One carefully sanitized renderer serves the draft canvas and public page */
+.veyra-page-content{display:grid;gap:24px;padding:clamp(24px,5vw,65px) clamp(18px,5vw,64px)}
+.vpage-block{min-width:0}.vpage-heading{font-size:clamp(29px,5vw,68px);line-height:1.08;letter-spacing:-.06em;margin:0;overflow-wrap:anywhere}
+.vpage-paragraph{font-size:clamp(15px,1.7vw,19px);line-height:1.8;max-width:750px;margin:0;white-space:pre-wrap}
+.vpage-cta{display:inline-flex;align-items:center;gap:12px;background:#3a285b;color:#fff;border-radius:999px;padding:15px 23px;font-weight:750;font-size:13px;transition:transform .2s,background .2s}
+.vpage-cta:hover{background:#5d4487;transform:translateY(-2px)}
+.vpage-divider{border:0;border-top:1px solid currentColor;opacity:.25;margin:15px 0}
+.vpage-figure{padding:0;margin:0}.vpage-figure img{display:block;width:100%;height:auto;max-height:660px;object-fit:contain;border-radius:12px}
+.vpage-quote{border-left:4px solid #9379c5;padding:10px 25px;margin:0;font-size:clamp(20px,3vw,35px);line-height:1.4;font-style:italic}
+.vpage-faq{border:1px solid currentColor;border-radius:12px;padding:18px;opacity:.9}.vpage-faq summary{cursor:pointer;font-weight:750}.vpage-faq p{line-height:1.65;margin-bottom:0}
+.vpage-spacer{height:30px}
+.vpage-public-shell{min-height:100vh;background:#f9f8f4;color:#221b31;font-family:Arial,Helvetica,sans-serif}
+.vpage-public-header,.vpage-public-footer{display:flex;gap:20px;justify-content:space-between;align-items:center;padding:25px max(5vw,20px);max-width:1440px;margin:auto}
+.vpage-public-header{border-bottom:1px solid #17121d26}.vpage-public-brand{font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.vpage-public-header nav{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:#51445e}
+.vpage-public-hero{padding:clamp(55px,9vw,130px) 5vw 15px;max-width:1440px;margin:auto}
+.vpage-public-hero h1{font-size:clamp(46px,9vw,125px);letter-spacing:-.075em;line-height:1;margin:20px 0}.vpage-public-hero>p:last-child{color:#655a70;font-size:17px;max-width:660px;line-height:1.7}
+.vpage-public-shell .veyra-page-content{max-width:1440px;margin:0 auto;padding-bottom:100px}
+.vpage-public-footer{border-top:1px solid #17121d26;font-size:11px;color:#6a6072}
+.portfolio-page-dropdown{position:relative}.portfolio-page-dropdown summary{cursor:pointer;list-style:none;font-size:12px}
+.portfolio-page-dropdown nav{position:absolute;right:0;top:100%;z-index:5;min-width:170px;border:1px solid #ffffff44;background:#17131f;padding:12px;display:grid;gap:9px;border-radius:12px;box-shadow:0 15px 30px #0007}
+.portfolio-page-dropdown nav a{color:white;line-height:1.35;font-size:12px}
+@media(max-width:1200px){.vstudio-workspace{grid-template-columns:190px minmax(0,1fr)}.vstudio-inspector{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr))}.vstudio-inspector h2,.vstudio-inspector .vstudio-guidance{grid-column:1/-1}}
+@media(max-width:850px){.vstudio-metadata{grid-template-columns:1fr 1fr}.vstudio-metadata label:last-child{grid-column:1/-1}.vstudio-workspace{grid-template-columns:1fr}.vstudio-library{grid-template-columns:repeat(2,minmax(0,1fr))}.vstudio-library h2,.vstudio-library>p,.vstudio-element-grid{grid-column:1/-1}.vstudio-inspector{grid-column:auto}}
+@media(max-width:520px){.vstudio{padding:13px}.vstudio-site-nav span{display:none}.vstudio-commands{width:100%}.vstudio-metadata{grid-template-columns:1fr}.vstudio-metadata label:last-child{grid-column:auto}.vstudio-library,.vstudio-inspector{grid-template-columns:1fr}.vstudio-library h2,.vstudio-library>p,.vstudio-element-grid{grid-column:auto}.vstudio-viewport{padding:6px}.vstudio-canvas{padding:10px}.vstudio-preview-nav{padding:13px}.vstudio-preview-nav span{display:none}.vpage-new-form>div{flex-direction:column}.vpage-page-card{align-items:flex-start;flex-direction:column}.vpage-public-header nav{gap:10px}.vpage-public-header{align-items:start}}
+@media(prefers-reduced-motion:reduce){.vpage-cta,.vstudio-preview-paper,.vstudio button{transition:none}.vpage-cta:hover{transform:none}}
