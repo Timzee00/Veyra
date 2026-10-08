@@ -24,9 +24,9 @@ export default function VisualSiteEditor({creatorId,creatorName,initialDraft,ini
    // Owner check: RLS remains authoritative for the actual write.
    const {data:owner,error:ownerError}=await db.from("creator_accounts").select("id").eq("id",creatorId).eq("owner_user_id",user.id).maybeSingle();
    if(ownerError||!owner)throw new Error("Only the website owner can change the design.");
-   const patch=publish?{design_draft:design,design_published:design}:{design_draft:design};
-   const {error:saveError}=await db.from("creator_sites").update(patch).eq("creator_id",creatorId);
+   const {error:saveError}=await db.from("creator_site_design_drafts").upsert({creator_id:creatorId,design},{onConflict:"creator_id"});
    if(saveError)throw saveError;
+   if(publish){const {error:publishError}=await db.rpc("veyra_publish_design",{target_creator:creatorId});if(publishError)throw publishError;}
    setSaved(design);if(publish)setPublished(design);
    setNotice(publish?"Design applied to your website.":"Draft saved. Your live website has not changed.");
   }catch(e){setError(e instanceof Error?e.message:"Could not save your design.");}
