@@ -25,6 +25,7 @@ type Site = {
   seo_description: string | null;
   template_id: string;
   template_version_id?: string | null;
+  design_published?: Record<string, unknown> | null;
 };
 
 function buildWhatsAppUrl(creator: Creator) {
@@ -55,13 +56,19 @@ export default function PortfolioRenderer({
   definition: TemplateDefinition;
 }) {
   const sections = getRendererSections(definition);
+  const design = site.design_published ?? {};
+  const accent = typeof design.accent === "string" && /^#[0-9a-fA-F]{6}$/.test(design.accent) ? design.accent : null;
+  const font = ["sans", "serif", "mono"].includes(String(design.font)) ? String(design.font) : "default";
+  const radius = ["sharp", "soft", "rounded"].includes(String(design.radius)) ? String(design.radius) : "default";
+  const motion = ["none", "subtle", "smooth"].includes(String(design.motion)) ? String(design.motion) : "default";
+  const alignment = design.heroAlignment === "center" ? "center" : "left";
   const whatsappUrl = buildWhatsAppUrl(creator);
   const featured = projects[0];
   const initials = creatorInitials(creator.display_name);
   const pageTitle = site.title?.trim() || creator.display_name;
 
   return (
-    <main className={`portfolio-shell template-${site.template_id}`}>
+    <main className={`portfolio-shell template-${site.template_id} custom-font-${font} custom-radius-${radius} custom-motion-${motion} custom-hero-${alignment}`} style={accent ? { "--portfolio-accent": accent } as React.CSSProperties : undefined}>
       <header className="portfolio-nav">
         <Link className="creator-brand" href="#top" aria-label={`${creator.display_name} home`}>
           <span className="creator-brand-mark">{initials}</span>
