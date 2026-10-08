@@ -129,3 +129,29 @@ begin
 end; $$;
 revoke all on function public.veyra_unpublish_site_page(uuid) from public,anon,authenticated;
 grant execute on function public.veyra_unpublish_site_page(uuid) to authenticated;
+
+-- Prevent a page moving between tenants and enforce the first-stage page quota.
+create or replace function public.veyra_guard_site_page()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare page_count integer;
+begin
+  if tg_op = 'UPDATE' then
+    if new.creator_id is distinct from old.creator_id or new.id is distinct from old.id then
+      raise exception 'Page ownership cannot be reassigned' using errcode='42501';
+    end if;
+  else
+    if auth.uid() is null or not app.current_user_owns_creator(new.creator_id) then
+      raise exception 'Unauthorized page creation' using errcode='42501';
+    end if;
+    -- Serializes concurrent page creation per site so the quota cannot be raced.
+    perform 1 from public.creator_accounts where id = new.creator_id for update;
+    select count(*) into page_count from public.site_pages where creator_id = new.creator_id;
+    if page_count >= 20 then
+      raise exception 'Maximum 20 website pages per workspace' using errcode='23514';
+    end if;
+  end if;
+  return new;
+end; $$;
+drop trigger if exists veyra_site_page_guard on public.site_pages;
+create trigger veyra_site_page_guard before insert or update on public.site_pages
+for each row execute function public.veyra_guard_site_page();
