@@ -28,7 +28,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
       const requestedNext = searchParams.get("next") || "/dashboard";
       const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//") && !requestedNext.includes("\\") ? requestedNext : "/dashboard";
       if (resetMode) {
-        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/settings` });
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/reset-password` });
         if (resetError) throw resetError;
         setMessage("If this email has an account, password recovery instructions will arrive shortly.");
         return;
