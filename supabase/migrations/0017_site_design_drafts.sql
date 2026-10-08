@@ -1,24 +1,42 @@
--- Versioned site-wide style overrides: drafts do not change the public site.
-alter table public.creator_sites add column if not exists design_draft jsonb not null default '{}'::jsonb;
+-- Publicly rendered settings and privately stored creator drafts are separate.
 alter table public.creator_sites add column if not exists design_published jsonb not null default '{}'::jsonb;
-alter table public.creator_sites add column if not exists design_revision integer not null default 0;
-create or replace function public.veyra_validate_design()
-returns trigger language plpgsql as $$
-declare body jsonb;
+create table if not exists public.creator_site_design_drafts (
+ creator_id uuid primary key references public.creator_accounts(id) on delete cascade,
+ design jsonb not null default '{}'::jsonb,
+ updated_at timestamptz not null default now()
+);
+alter table public.creator_site_design_drafts enable row level security;
+create policy veyra_design_owner_read on public.creator_site_design_drafts for select to authenticated
+ using (app.current_user_owns_creator(creator_id));
+create policy veyra_design_owner_insert on public.creator_site_design_drafts for insert to authenticated
+ with check (app.current_user_owns_creator(creator_id));
+create policy veyra_design_owner_update on public.creator_site_design_drafts for update to authenticated
+ using (app.current_user_owns_creator(creator_id)) with check (app.current_user_owns_creator(creator_id));
+create or replace function public.veyra_valid_design(body jsonb)
+returns boolean language sql immutable set search_path = public as $$
+ select jsonb_typeof(body) = 'object'
+   and (select count(*) from jsonb_object_keys(body)) <= 8
+   and (not (body ? 'accent') or (jsonb_typeof(body->'accent') = 'string' and (body->>'accent') ~ '^#[0-9a-fA-F]{6}$'))
+   and (not (body ? 'font') or body->>'font' in ('sans','serif','mono'))
+   and (not (body ? 'motion') or body->>'motion' in ('none','subtle','smooth'))
+   and (not (body ? 'radius') or body->>'radius' in ('sharp','soft','rounded'))
+   and (not (body ? 'heroAlignment') or body->>'heroAlignment' in ('left','center'))
+   and not exists (select 1 from jsonb_object_keys(body) as k where k not in ('accent','font','motion','radius','heroAlignment'));
+$$;
+alter table public.creator_sites add constraint veyra_published_design_valid check (public.veyra_valid_design(design_published));
+alter table public.creator_site_design_drafts add constraint veyra_private_draft_valid check (public.veyra_valid_design(design));
+-- A caller can publish their own draft only; cannot publish an arbitrary JSON payload.
+create or replace function public.veyra_publish_design(target_creator uuid)
+returns void language plpgsql security definer set search_path = public as $$
+declare draft jsonb;
 begin
-  foreach body in array array[new.design_draft,new.design_published] loop
-    if jsonb_typeof(body) <> 'object'
-       or (select count(*) from jsonb_object_keys(body)) > 8
-       or (body ? 'accent' and (jsonb_typeof(body->'accent') <> 'string' or (body->>'accent') !~ '^#[0-9a-fA-F]{6}$'))
-       or (body ? 'font' and body->>'font' not in ('sans','serif','mono'))
-       or (body ? 'motion' and body->>'motion' not in ('none','subtle','smooth'))
-       or (body ? 'radius' and body->>'radius' not in ('sharp','soft','rounded'))
-       or (body ? 'heroAlignment' and body->>'heroAlignment' not in ('left','center')) then
-      raise exception 'Invalid website design settings' using errcode = '22023';
-    end if;
-  end loop;
-  return new;
+ if auth.uid() is null or not app.current_user_owns_creator(target_creator) then
+   raise exception 'Permission denied' using errcode='42501';
+ end if;
+ select design into draft from public.creator_site_design_drafts where creator_id=target_creator;
+ if draft is null then raise exception 'Save a design draft first' using errcode='22023'; end if;
+ update public.creator_sites set design_published=draft,updated_at=now() where creator_id=target_creator;
+ if not found then raise exception 'Website not found' using errcode='22023'; end if;
 end; $$;
-drop trigger if exists veyra_validate_design_settings on public.creator_sites;
-create trigger veyra_validate_design_settings before insert or update of design_draft,design_published
-on public.creator_sites for each row execute function public.veyra_validate_design();
+revoke all on function public.veyra_publish_design(uuid) from public, anon;
+grant execute on function public.veyra_publish_design(uuid) to authenticated;
