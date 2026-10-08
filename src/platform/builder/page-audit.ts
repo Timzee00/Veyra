@@ -19,7 +19,7 @@ export function auditPage(title: string, description: string, blocks: unknown): 
   for (const block of document) {
     const text = typeof block.props.text === "string" ? block.props.text : "";
     if (block.type === "image") {
-      if (String(block.props.url ?? "").startsWith("https://placehold.co/")) errors.push("Replace the temporary image placeholder with your own image before publishing.");
+      if (String(block.props.url ?? "") === "/site-editor-placeholder.svg") errors.push("Replace the temporary image placeholder with your own image before publishing.");
       if (!String(block.props.alt ?? "").trim()) recommendations.push("Add helpful alternative text to informative images.");
     }
     if (block.type === "heading" && text.toLowerCase().includes("your next great headline")) errors.push("Replace the example heading before publishing.");
