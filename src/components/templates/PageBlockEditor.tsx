@@ -39,7 +39,7 @@ export default function PageBlockEditor({creatorId,initialBlocks,initialRevision
    const {data:newRevision,error}=await db.rpc("veyra_save_homepage_draft",{target_creator:creatorId,expected_revision:revision,next_blocks:blocks});if(error)throw error;
    setRevision(newRevision as number);
    setSaved(JSON.stringify(blocks));
-   if(publish){const {error:publishError}=await db.rpc("veyra_publish_builder",{target_creator:creatorId});if(publishError)throw publishError;}
+   if(publish){const {error:publishError}=await db.rpc("veyra_publish_builder",{target_creator:creatorId,expected_revision:newRevision});if(publishError)throw publishError;}
    setStatus(publish?"Your page sections are now live.":"Draft saved privately.");
   }catch(e){setStatus(e instanceof Error?e.message:"Could not save.");}finally{setBusy(false);}
  }
