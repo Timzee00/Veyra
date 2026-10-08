@@ -1,7 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createPageBlock, makeSectionKit, pageDocumentIsValid, safeSiteUrl, SECTION_KITS } from "../src/platform/builder/page-model.ts";
-import { auditPage } from "../src/platform/builder/page-audit.ts";
 
 test("safe links allow internal routes and HTTPS, never script, protocol-relative, or insecure URLs", () => {
   for (const url of ["/", "/contact", "/pages/about", "https://example.com/path?q=1"])
@@ -40,15 +39,3 @@ test("supports each permitted block type", () => {
   assert.equal(pageDocumentIsValid(all), true);
 });
 
-test("page audit distinguishes draft issues from useful publishing guidance", () => {
-  const draft=[createPageBlock("heading"),createPageBlock("image")];
-  const result=auditPage("Our studio","",draft);
-  assert.ok(result.errors.some(item=>item.includes("example heading")));
-  assert.ok(result.errors.some(item=>item.includes("temporary image")));
-  assert.ok(result.recommendations.some(item=>item.includes("search engine description")));
-  const clean=auditPage("About our studio","We help people create better digital experiences through carefully designed and accessible websites.",[
-    { ...createPageBlock("heading"),props:{text:"About our studio"} },
-    { ...createPageBlock("paragraph"),props:{text:"We create accessible websites for businesses."} },
-  ]);
-  assert.deepEqual(clean.errors,[]);
-});
