@@ -37,7 +37,7 @@ export default async function DashboardPage() {
         <div className="dashboard-context"><span>CREATOR SPACE</span><strong>{creator.display_name}</strong><small>@{creator.handle}</small></div>
         <nav className="dashboard-nav">
           <Link className="active" href="/dashboard">Overview</Link>
-          <Link href="/dashboard/projects">Projects</Link>
+          <Link href="/dashboard/pages">Website pages</Link><Link href="/dashboard/projects">Projects</Link>
           <Link href="/dashboard/profile">Profile</Link>
           <Link href="/dashboard/appearance">Appearance</Link>
           <Link href="/dashboard/analytics">Analytics</Link>
@@ -70,6 +70,11 @@ export default async function DashboardPage() {
             <div className="card-heading"><div><p className="eyebrow">YOUR WORK</p><h2>Build the portfolio.</h2></div><Link href="/dashboard/projects">Manage projects ↗</Link></div>
             <p>Projects are the core of your Veyra presence. Add case studies, imagery, motion and the story behind the work.</p>
             <Link className="dashboard-action" href="/dashboard/projects/new">Create your first project <span>↗</span></Link>
+          </article>
+          <article className="dashboard-card">
+            <p className="eyebrow">WEBSITE STUDIO</p><h2>Create more than a homepage.</h2>
+            <p>Build dedicated About, Services, FAQ, and other pages. Edit drafts visually, review layouts, and publish each page when ready.</p>
+            <Link href="/dashboard/pages">Open page studio →</Link>
           </article>
           <article className="dashboard-card">
             <p className="eyebrow">IDENTITY</p><h2>{creator.display_name}</h2><p>{creator.bio || "Add a short bio so visitors immediately understand what you create."}</p><Link href="/dashboard/profile">Edit profile →</Link>
