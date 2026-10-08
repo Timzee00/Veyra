@@ -115,7 +115,9 @@ begin
          or lower(coalesce(b->'props'->>'text','')) in
             ('your next great headline','write something helpful for your visitors.','add a genuine quote from a customer or collaborator.')
          or (b->>'type'='faq' and (nullif(btrim(coalesce(b->'props'->>'question','')),'') is null
-             or nullif(btrim(coalesce(b->'props'->>'answer','')),'') is null))
+             or nullif(btrim(coalesce(b->'props'->>'answer','')),'') is null
+             or lower(b->'props'->>'question')='a question your visitors ask'
+             or lower(b->'props'->>'answer')='give a clear, useful answer.'))
     ) then
    raise exception 'Complete the page and replace example content before publishing' using errcode='23514';
  end if;
