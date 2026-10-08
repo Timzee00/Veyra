@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import PageBlocks from "@/components/builder/PageBlocks";
+import { auditPage } from "@/platform/builder/page-audit";
 import { createPageBlock, makeSectionKit, PAGE_BLOCK_KINDS, pageDocumentIsValid, SECTION_KITS } from "@/platform/builder/page-model";
 import type { PageBlock, PageBlockKind, PageDocument } from "@/platform/builder/page-model";
 
@@ -41,6 +42,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
+  const audit = useMemo(() => auditPage(title, description, blocks), [title, description, blocks]);
   const contentErrors = useMemo(() => {
     const issues: string[] = [];
     if (!pageDocumentIsValid(blocks)) issues.push("Some blocks have invalid content or unsafe URLs.");
@@ -114,7 +116,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
 
   async function saveAndPublish() {
     if (!siteLive) { setError("Publish your main Veyra website before this page can become public."); return; }
-    if (contentErrors.length) { setError(contentErrors[0]); return; }
+    if (contentErrors.length || audit.errors.length) { setError((contentErrors[0] || audit.errors[0]) ?? "Please complete the page."); return; }
     setBusy(true); setError(""); setMessage("");
     try {
       let latest = revision;
@@ -190,7 +192,8 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
         {(selected.type==="spacer"||selected.type==="divider")&&<p>This element adds spacing or separates sections without needing text.</p>}
         </>:<p>Select an element from Layers to edit its content.</p>}
         <div className="vstudio-guidance"><h3>Publishing checklist</h3><p>Ensure text is accurate, buttons have valid links, and any uploaded images have helpful descriptions. Review all screen widths before publishing.</p>
-          {contentErrors.map(issue=><p className="vstudio-issue" key={issue}>{issue}</p>)}
+          {[...contentErrors,...audit.errors].map(issue=><p className="vstudio-issue" key={issue}>{issue}</p>)}
+          {audit.recommendations.map(tip=><p key={tip}>Suggestion: {tip}</p>)}
         </div>
       </aside>
     </div>
