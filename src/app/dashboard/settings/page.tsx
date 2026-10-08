@@ -22,6 +22,7 @@ export default async function SettingsPage() {
         <section className="dashboard-card"><p className="eyebrow">SIGNED IN AS</p><h2>Your account</h2><p>{user.email}</p><p>Protect your account by keeping access to your verified email address.</p><SignOutButton /></section>
         <section className="dashboard-card"><p className="eyebrow">YOUR PUBLIC IDENTITY</p><h2>Creator profile</h2><p>Update your display name, creative field, location, description and public contact details.</p><Link href="/dashboard/profile">Edit my profile →</Link></section>
         <section className="dashboard-card"><p className="eyebrow">YOUR PORTFOLIO</p><h2>Website appearance</h2><p>Choose an available layout for your public portfolio.</p><Link href="/dashboard/appearance">Manage website →</Link></section>
+        <section className="dashboard-card"><p className="eyebrow">PRO WEBSITE · COMING SOON</p><h2>Use your own domain</h2><p>Keep your free Veyra address, or connect a domain you own when paid custom domains become available. Registration, verification, HTTPS and billing are not active yet.</p><span className="profile-visibility">Paid upgrade · Not available yet</span></section>
         <section className="dashboard-card"><p className="eyebrow">PRIVACY</p><h2>Understand your choices</h2><p>Review the privacy and cookie policies. Account export and deletion controls are not yet available.</p><Link href="/privacy">Privacy information →</Link></section>
       </div>
       <p className="auth-powered">Powered by Timzee Corp</p>
