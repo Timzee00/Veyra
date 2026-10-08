@@ -38,3 +38,13 @@
 .template-agency .portfolio-contact-section{background:#191917;color:#fff;width:100%;max-width:none;padding-left:max(24px,calc((100vw - 1380px)/2))}
 .template-agency .portfolio-contact-section .button-primary{background:#e9e7df;color:#111}
 @media(max-width:760px){.template-editorial .portfolio-project:nth-child(even){transform:none}.template-cinema .portfolio-featured{min-height:420px}.template-cinema .portfolio-featured img,.template-cinema .portfolio-featured-placeholder{height:420px}.template-cinema .portfolio-featured-copy{padding:30px}.template-immersive .portfolio-hero{padding-left:22px}.template-agency .portfolio-contact-section{padding:80px 24px}}
+
+/* Site-owner choices; these apply only to published overrides. */
+.portfolio-shell.custom-font-sans{font-family:Arial,Helvetica,sans-serif}.portfolio-shell.custom-font-serif{font-family:Georgia,"Times New Roman",serif}.portfolio-shell.custom-font-mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.portfolio-shell.custom-radius-sharp .portfolio-project,.portfolio-shell.custom-radius-sharp .portfolio-featured img,.portfolio-shell.custom-radius-sharp .portfolio-contact{border-radius:0}.portfolio-shell.custom-radius-rounded .portfolio-project,.portfolio-shell.custom-radius-rounded .portfolio-featured img{border-radius:32px}.portfolio-shell.custom-radius-rounded .portfolio-contact{border-radius:999px}
+.portfolio-shell.custom-hero-center .portfolio-hero{text-align:center;align-items:center}.portfolio-shell.custom-hero-center .portfolio-hero>p{margin-left:auto;margin-right:auto}
+.portfolio-shell[style*="--portfolio-accent"] .portfolio-contact,.portfolio-shell[style*="--portfolio-accent"] .button-primary{background:var(--portfolio-accent);border-color:var(--portfolio-accent);color:#111}
+.portfolio-shell.custom-motion-smooth .portfolio-project{transition:transform .4s ease,box-shadow .4s ease}.portfolio-shell.custom-motion-smooth .portfolio-project:hover{transform:translateY(-7px);box-shadow:0 16px 38px #0004}
+.portfolio-shell.custom-motion-subtle .portfolio-project{transition:transform .2s ease}.portfolio-shell.custom-motion-subtle .portfolio-project:hover{transform:translateY(-2px)}
+.portfolio-shell.custom-motion-none *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){.portfolio-shell.custom-motion-smooth .portfolio-project:hover,.portfolio-shell.custom-motion-subtle .portfolio-project:hover{transform:none}}
