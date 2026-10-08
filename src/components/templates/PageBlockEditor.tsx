@@ -12,10 +12,11 @@ const SECTION_PRESETS = [
  {id:"about",label:"About / Story",elements:[["heading","The story behind the work"],["paragraph","Share your experience, values and the people you serve."]]},
  {id:"contact",label:"Contact / Call to action",elements:[["heading","Let's work together"],["paragraph","Tell visitors how to reach you and what happens next."],["button","Get in touch"]]},
 ] as const;
-export default function PageBlockEditor({creatorId,initialBlocks,visible}:{creatorId:string;initialBlocks:unknown;visible:boolean}){
+export default function PageBlockEditor({creatorId,initialBlocks,initialRevision,visible}:{creatorId:string;initialBlocks:unknown;initialRevision:number;visible:boolean}){
  const initial=validateBuilderTree(initialBlocks)&&initialBlocks.every(x=>supported.includes(x.type as Kind))?initialBlocks:[];
  const [blocks,setBlocks]=useState<BuilderNode[]>(initial);
  const [saved,setSaved]=useState(JSON.stringify(initial));
+ const [revision,setRevision]=useState(initialRevision);
  const [history,setHistory]=useState<BuilderNode[][]>([]);
  const [future,setFuture]=useState<BuilderNode[][]>([]);
  const [busy,setBusy]=useState(false);const [status,setStatus]=useState("");
@@ -35,7 +36,8 @@ export default function PageBlockEditor({creatorId,initialBlocks,visible}:{creat
    const db=createSupabaseBrowserClient();
    const {data:{user}}=await db.auth.getUser();if(!user)throw new Error("Please sign in.");
    const {data:owner}=await db.from("creator_accounts").select("id").eq("owner_user_id",user.id).eq("id",creatorId).maybeSingle();if(!owner)throw new Error("You cannot edit this website.");
-   const {error}=await db.from("creator_page_drafts").upsert({creator_id:creatorId,blocks},{onConflict:"creator_id"});if(error)throw error;
+   const {data:newRevision,error}=await db.rpc("veyra_save_homepage_draft",{target_creator:creatorId,expected_revision:revision,next_blocks:blocks});if(error)throw error;
+   setRevision(newRevision as number);
    setSaved(JSON.stringify(blocks));
    if(publish){const {error:publishError}=await db.rpc("veyra_publish_builder",{target_creator:creatorId});if(publishError)throw publishError;}
    setStatus(publish?"Your page sections are now live.":"Draft saved privately.");
