@@ -111,7 +111,7 @@ begin
     or not exists (select 1 from jsonb_array_elements(draft.draft_blocks) b where b->>'type'='heading')
     or exists (
       select 1 from jsonb_array_elements(draft.draft_blocks) b
-      where (b->>'type'='image' and b->'props'->>'url' like 'https://placehold.co/%')
+      where (b->>'type'='image' and b->'props'->>'url' = '/site-editor-placeholder.svg')
          or lower(coalesce(b->'props'->>'text','')) in
             ('your next great headline','write something helpful for your visitors.','add a genuine quote from a customer or collaborator.')
          or (b->>'type'='faq' and (nullif(btrim(coalesce(b->'props'->>'question','')),'') is null
