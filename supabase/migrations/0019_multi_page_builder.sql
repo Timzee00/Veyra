@@ -9,7 +9,7 @@ begin
   if jsonb_array_length(document) > 80 then return false; end if;
   for block in select value from jsonb_array_elements(document) loop
     if jsonb_typeof(block) is distinct from 'object'
-      or block->>'type' not in ('heading','paragraph','button','divider','image','quote','faq','spacer')
+      or coalesce(block->>'type','') not in ('heading','paragraph','button','divider','image','quote','faq','spacer')
       or coalesce(block->>'id','') !~ '^[a-zA-Z0-9_-]{1,80}$'
       or block->>'id' = any(ids)
       or jsonb_typeof(block->'props') is distinct from 'object'
