@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import SignOutButton from "@/components/auth/SignOutButton";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -48,7 +49,7 @@ export default async function DashboardPage() {
       <section className="dashboard-main">
         <header className="dashboard-topbar">
           <div><p className="eyebrow">CREATOR DASHBOARD</p><h1>Good to have you back.</h1></div>
-          <div className="dashboard-user"><span>{user.email}</span><Link href="/">Exit</Link></div>
+          <div className="dashboard-user"><span>{user.email}</span><SignOutButton /></div>
         </header>
 
         <div className="welcome-panel">
