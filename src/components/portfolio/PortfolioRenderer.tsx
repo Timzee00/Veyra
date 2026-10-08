@@ -133,11 +133,8 @@ export default function PortfolioRenderer({
               </section>
             );
           case "services":
-            return (
-              <section className="portfolio-services" key={key}>
-                <p className="eyebrow">SERVICES</p><div className="service-lines"><span>Brand identity</span><span>Digital design</span><span>Motion & visual systems</span><span>Creative direction</span></div>
-              </section>
-            );
+            // Services must never be invented for a creator. Render only after editable creator services exist.
+            return null;
           case "contact":
             return (
               <section id="contact" className={`portfolio-contact-section contact-${section.variant ?? "simple"}`} key={key}>
