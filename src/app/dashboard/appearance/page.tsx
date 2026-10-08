@@ -14,13 +14,14 @@ export default async function AppearancePage() {
   if (!user) redirect("/login?next=/dashboard/appearance");
   const { data: creator } = await supabase.from("creator_accounts").select("id, handle, display_name").eq("owner_user_id", user.id).maybeSingle();
   if (!creator) redirect("/onboarding");
-  const { data: site } = await supabase.from("creator_sites").select("template_id, visibility, design_draft, design_published").eq("creator_id", creator.id).maybeSingle();
+  const { data: site } = await supabase.from("creator_sites").select("template_id, visibility, design_published").eq("creator_id", creator.id).maybeSingle();
   if (!site) redirect("/dashboard/profile");
+  const { data: privateDraft } = await supabase.from("creator_site_design_drafts").select("design").eq("creator_id", creator.id).maybeSingle();
 
   return (
     <main className="dashboard-shell">
       <aside className="dashboard-sidebar"><Link className="dashboard-brand" href="/">V<span>V</span> VEYRA</Link><div className="dashboard-context"><span>CREATOR SPACE</span><strong>{creator.display_name}</strong></div><nav className="dashboard-nav"><Link href="/dashboard">Overview</Link><Link href="/dashboard/projects">Projects</Link><Link href="/dashboard/profile">Profile</Link><Link className="active" href="/dashboard/appearance">Appearance</Link><Link href="/dashboard/analytics">Analytics</Link><Link href="/dashboard/settings">Settings</Link></nav></aside>
-      <section className="dashboard-main narrow-main"><header className="dashboard-topbar"><div><p className="eyebrow">PRESENTATION SYSTEM</p><h1>Choose your canvas.</h1></div><Link href={site.visibility === "published" ? `/creator/${creator.handle}` : "/dashboard"}>Back</Link></header><TemplatePicker creatorId={creator.id} currentTemplateId={site.template_id} templates={BUILT_IN_TEMPLATES.map(({ definition, ...template }) => ({ ...template }))} /><VisualSiteEditor creatorId={creator.id} creatorName={creator.display_name} initialDraft={site.design_draft} initialPublished={site.design_published} visible={site.visibility === "published"} /></section>
+      <section className="dashboard-main narrow-main"><header className="dashboard-topbar"><div><p className="eyebrow">PRESENTATION SYSTEM</p><h1>Choose your canvas.</h1></div><Link href={site.visibility === "published" ? `/creator/${creator.handle}` : "/dashboard"}>Back</Link></header><TemplatePicker creatorId={creator.id} currentTemplateId={site.template_id} templates={BUILT_IN_TEMPLATES.map(({ definition, ...template }) => ({ ...template }))} /><VisualSiteEditor creatorId={creator.id} creatorName={creator.display_name} initialDraft={privateDraft?.design ?? site.design_published} initialPublished={site.design_published} visible={site.visibility === "published"} /></section>
     </main>
   );
 }
