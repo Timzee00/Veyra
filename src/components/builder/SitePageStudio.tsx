@@ -114,6 +114,20 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     return data.revision;
   }
 
+  // Desktop editing convenience: Ctrl/Cmd+S saves the private draft without publishing.
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        if (!dirty || busy) return;
+        setBusy(true);
+        void saveDraft().finally(() => setBusy(false));
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
+
   async function saveAndPublish() {
     if (!siteLive) { setError("Publish your main Veyra website before this page can become public."); return; }
     if (contentErrors.length || audit.errors.length) { setError((contentErrors[0] || audit.errors[0]) ?? "Please complete the page."); return; }
