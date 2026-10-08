@@ -12,6 +12,8 @@ export default function AuthForm({ mode }: { mode: Mode }) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,12 +25,19 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const next = searchParams.get("next") || "/dashboard";
+      const requestedNext = searchParams.get("next") || "/dashboard";
+      const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//") && !requestedNext.includes("\\") ? requestedNext : "/dashboard";
+      if (resetMode) {
+        const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard/settings` });
+        if (resetError) throw resetError;
+        setMessage("If this email has an account, password recovery instructions will arrive shortly.");
+        return;
+      }
 
       if (mode === "login") {
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
-        window.location.assign(next.startsWith("/") ? next : "/dashboard");
+        window.location.assign(next);
         return;
       }
 
@@ -53,7 +62,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
   return (
     <form className="auth-form" onSubmit={submit} noValidate>
-      {mode === "signup" && (
+      {mode === "signup" && !resetMode && (
         <label>
           Full name
           <input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required minLength={2} />
@@ -63,12 +72,14 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         Email address
         <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required />
       </label>
-      <label>
+      {!resetMode && <label>
         Password
-        <input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} required minLength={8} />
-      </label>
+        <input value={password} onChange={(event) => setPassword(event.target.value)} type={showPassword ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} required={!resetMode} minLength={8} />
+      </label>}
+      {!resetMode && <button type="button" className="auth-text-button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "Hide password" : "Show password"}</button>}
+      {mode === "login" && <button type="button" className="auth-text-button" onClick={() => { setResetMode(!resetMode); setError(null); setMessage(null); }}>{resetMode ? "Back to sign in" : "Forgot password?"}</button>}
       <button type="submit" disabled={busy}>
-        {busy ? "Working…" : mode === "login" ? "Log in ↗" : "Create account ↗"}
+        {busy ? "Working…" : resetMode ? "Send recovery email ↗" : mode === "login" ? "Log in ↗" : "Create account ↗"}
       </button>
       {message && <p className="form-message" role="status">{message}</p>}
       {error && <p className="form-error" role="alert">{error}</p>}
