@@ -51,11 +51,13 @@ export default function PortfolioRenderer({
   site,
   projects,
   definition,
+  sitePages = [],
 }: {
   creator: Creator;
   site: Site;
   projects: Project[];
   definition: TemplateDefinition;
+  sitePages?: Array<{ slug: string; title: string }>;
 }) {
   const sections = getRendererSections(definition);
   const publishedBlocks = validateBuilderTree(site.builder_published) ? site.builder_published.filter(block => ["heading","paragraph","button","divider"].includes(block.type)) : [];
@@ -83,6 +85,7 @@ export default function PortfolioRenderer({
         </Link>
 
         <div className="portfolio-nav-actions">
+          {sitePages.length > 0 && <details className="portfolio-page-dropdown"><summary>Pages ▾</summary><nav aria-label="Website pages">{sitePages.map(page=><Link key={page.slug} href={`/creator/${creator.handle}/pages/${page.slug}`}>{page.title}</Link>)}</nav></details>}
           <a className="portfolio-nav-work" href="#work">Work</a>
           {whatsappUrl ? (
             <a className="portfolio-contact" href={whatsappUrl} target="_blank" rel="noreferrer">Start a project ↗</a>
