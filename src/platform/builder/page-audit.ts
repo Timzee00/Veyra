@@ -1,0 +1,32 @@
+import { pageDocumentIsValid } from "./page-model";
+import type { PageDocument } from "./page-model";
+
+export type PageAudit = { errors: string[]; recommendations: string[] };
+
+export function auditPage(title: string, description: string, blocks: unknown): PageAudit {
+  const errors: string[] = [];
+  const recommendations: string[] = [];
+  if (!title.trim()) errors.push("Give this page a useful title.");
+  if (!pageDocumentIsValid(blocks)) {
+    errors.push("Some blocks contain unsupported content, invalid links, or malformed fields.");
+    return { errors, recommendations };
+  }
+  const document = blocks as PageDocument;
+  if (!document.some(block => block.type === "heading")) recommendations.push("Add a clear heading to explain the purpose of the page.");
+  if (document.length === 0) recommendations.push("Add some content before inviting visitors to this page.");
+  if (!description.trim()) recommendations.push("Add a search engine description to help people understand this page.");
+  else if (description.length < 50 || description.length > 160) recommendations.push("A search description around 50–160 characters is often easier to display in search results.");
+  for (const block of document) {
+    const text = typeof block.props.text === "string" ? block.props.text : "";
+    if (block.type === "image") {
+      if (String(block.props.url ?? "").startsWith("https://placehold.co/")) errors.push("Replace the temporary image placeholder with your own image before publishing.");
+      if (!String(block.props.alt ?? "").trim()) recommendations.push("Add helpful alternative text to informative images.");
+    }
+    if (block.type === "heading" && text.toLowerCase().includes("your next great headline")) errors.push("Replace the example heading before publishing.");
+    if (block.type === "paragraph" && text.toLowerCase().includes("write something helpful")) errors.push("Replace the example paragraph before publishing.");
+    if (block.type === "quote" && text.toLowerCase().includes("add a genuine quote")) errors.push("Replace the testimonial example with genuine, approved wording.");
+    if (block.type === "faq" && (!String(block.props.question ?? "").trim() || !String(block.props.answer ?? "").trim())) errors.push("Fill in both the question and answer of each FAQ.");
+    if (block.type === "button" && !text.trim()) errors.push("Label each button so visitors know what it does.");
+  }
+  return { errors: Array.from(new Set(errors)), recommendations: Array.from(new Set(recommendations)) };
+}
