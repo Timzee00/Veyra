@@ -10,7 +10,7 @@ export default async function ProfilePage() {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/dashboard/profile");
-  const { data: creator } = await supabase.from("creator_accounts").select("id, handle, display_name, bio, website_url, whatsapp_number, default_inquiry_message").eq("owner_user_id", user.id).maybeSingle();
+  const { data: creator } = await supabase.from("creator_accounts").select("id, handle, display_name, bio, category, location, website_url, whatsapp_number, default_inquiry_message").eq("owner_user_id", user.id).maybeSingle();
   if (!creator) redirect("/onboarding");
   const { data: site } = await supabase.from("creator_sites").select("visibility, title, seo_description").eq("creator_id", creator.id).maybeSingle();
 
