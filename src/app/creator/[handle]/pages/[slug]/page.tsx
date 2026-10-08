@@ -35,7 +35,7 @@ export default async function PublicSitePage({params}:RouteProps){
   return <main className="vpage-public-shell">
     <header className="vpage-public-header"><Link href={`/creator/${creator.handle}`} className="vpage-public-brand">{creator.display_name}</Link><nav aria-label="Page navigation"><Link href={`/creator/${creator.handle}`}>Home</Link><Link href={`/u/${creator.handle}`}>Creator profile</Link></nav></header>
     <section className="vpage-public-hero"><p className="eyebrow">WELCOME / {creator.display_name}</p><h1>{page.title}</h1>{page.seo_description&&<p>{page.seo_description}</p>}</section>
-    <PageBlocks blocks={page.blocks}/>
+    <PageBlocks blocks={page.blocks} siteBasePath={`/creator/${creator.handle}`}/>
     <footer className="vpage-public-footer"><Link href={`/creator/${creator.handle}`}>← Back to website</Link><span>Powered by Timzee Corp</span></footer>
   </main>;
 }
