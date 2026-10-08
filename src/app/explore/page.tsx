@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Discover", description: "Search creators and creative work across Veyra." };
 
-export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; type?: string; before?: string }> }) {
+export default async function ExplorePage({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; type?: string; before?: string; beforeId?: string }> }) {
   const params = await searchParams;
   const q = (params.q ?? "").trim();
   const category = (params.category ?? "").trim();
@@ -24,22 +24,23 @@ export default async function ExplorePage({ searchParams }: { searchParams: Prom
     postQuery.or(`title.ilike.${search},excerpt.ilike.${search}`);
   }
   if (category) creatorQuery.ilike("category", `%${category}%`);
-  if (before) creatorQuery.lt("created_at", before);
+  const beforeId = params.beforeId && /^[a-f0-9-]{36}$/i.test(params.beforeId) ? params.beforeId : null;
+  if (before && beforeId) creatorQuery.or(`created_at.lt.${before},and(created_at.eq.${before},id.lt.${beforeId})`);
 
   const [{ data: creators }, { data: projects }, { data: posts }] = await Promise.all([
-    type === "projects" || type === "posts" ? Promise.resolve({ data: [] }) : creatorQuery.order("featured", { ascending: false }).order("created_at", { ascending: false }).limit(25),
+    type === "projects" || type === "posts" ? Promise.resolve({ data: [] }) : creatorQuery.order("created_at", { ascending: false }).order("id", { ascending: false }).limit(25),
     type === "creators" || type === "posts" ? Promise.resolve({ data: [] }) : projectQuery.order("published_at", { ascending: false }).limit(30),
     type === "creators" || type === "projects" ? Promise.resolve({ data: [] }) : postQuery.order("published_at", { ascending: false }).limit(30),
   ]);
 
   const creatorRows = (creators ?? []).slice(0, 24);
-  const lastCreator = creatorRows[creatorRows.length - 1] as { created_at?: string } | undefined;
+  const lastCreator = creatorRows[creatorRows.length - 1] as { id?: string; created_at?: string } | undefined;
   const nextCreatorCursor = (creators?.length ?? 0) > 24 && lastCreator?.created_at ? lastCreator.created_at : null;
   const nextCreatorParams = new URLSearchParams();
   if (q) nextCreatorParams.set("q", q);
   if (category) nextCreatorParams.set("category", category);
   if (type !== "all") nextCreatorParams.set("type", type);
-  if (nextCreatorCursor) nextCreatorParams.set("before", nextCreatorCursor);
+  if (nextCreatorCursor && lastCreator?.id) { nextCreatorParams.set("before", nextCreatorCursor); nextCreatorParams.set("beforeId", lastCreator.id); }
 
   const projectRows = (projects ?? []).map((item) => ({ ...item, creator: Array.isArray(item.creator_accounts) ? item.creator_accounts[0] : item.creator_accounts })) as Array<{ id:string; slug:string; title:string; summary:string|null; published_at:string|null; creator:{handle:string;display_name:string}|null }>;
   const postRows = (posts ?? []).map((item) => ({ ...item, creator: Array.isArray(item.creator_accounts) ? item.creator_accounts[0] : item.creator_accounts })) as Array<{ id:string; slug:string; title:string; excerpt:string|null; post_type:string; published_at:string|null; creator:{handle:string;display_name:string}|null }>;
