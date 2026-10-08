@@ -48,3 +48,5 @@
 .portfolio-shell.custom-motion-subtle .portfolio-project{transition:transform .2s ease}.portfolio-shell.custom-motion-subtle .portfolio-project:hover{transform:translateY(-2px)}
 .portfolio-shell.custom-motion-none *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 @media(prefers-reduced-motion:reduce){.portfolio-shell.custom-motion-smooth .portfolio-project:hover,.portfolio-shell.custom-motion-subtle .portfolio-project:hover{transform:none}}
+
+.veyra-published-blocks{max-width:1200px;padding:65px 5vw;margin:auto;display:flex;align-items:flex-start;flex-direction:column;gap:18px}.veyra-published-blocks h2{font-size:clamp(30px,6vw,72px);letter-spacing:-.055em;line-height:1.1;margin:0}.veyra-published-blocks p{max-width:760px;line-height:1.8;font-size:clamp(15px,2vw,20px);margin:0}.veyra-published-blocks a{display:inline-flex;padding:14px 22px;border:1px solid currentColor;border-radius:99px;font-weight:650}.veyra-published-blocks hr{width:100%;border:0;border-top:1px solid currentColor;opacity:.25;margin:20px 0}
