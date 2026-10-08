@@ -107,6 +107,18 @@ begin
  if draft.revision <> expected_revision then
    raise exception 'Page changed; reload before publishing' using errcode='40001';
  end if;
+ if jsonb_array_length(draft.draft_blocks) = 0
+    or not exists (select 1 from jsonb_array_elements(draft.draft_blocks) b where b->>'type'='heading')
+    or exists (
+      select 1 from jsonb_array_elements(draft.draft_blocks) b
+      where (b->>'type'='image' and b->'props'->>'url' like 'https://placehold.co/%')
+         or lower(coalesce(b->'props'->>'text','')) in
+            ('your next great headline','write something helpful for your visitors.','add a genuine quote from a customer or collaborator.')
+         or (b->>'type'='faq' and (nullif(btrim(coalesce(b->'props'->>'question','')),'') is null
+             or nullif(btrim(coalesce(b->'props'->>'answer','')),'') is null))
+    ) then
+   raise exception 'Complete the page and replace example content before publishing' using errcode='23514';
+ end if;
  insert into public.site_page_publications(page_id,creator_id,slug,title,seo_description,blocks,revision,published_at)
  values (draft.id,draft.creator_id,draft.slug,draft.title,draft.seo_description,draft.draft_blocks,draft.revision,now())
  on conflict (page_id) do update set
