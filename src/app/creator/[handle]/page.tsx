@@ -60,6 +60,9 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
     .eq("published", true)
     .order("published_at", { ascending: false });
 
+  const { data: publishedPages } = await supabase.from("site_page_publications")
+    .select("slug,title").eq("creator_id",creator.id).order("published_at",{ascending:false}).limit(12);
+
   const template = getBuiltInTemplate(site.template_id);
   if (!template) notFound();
 
@@ -78,5 +81,5 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
 
   const projectsWithCovers = (projects ?? []).map((project) => ({ ...project, coverUrl: coverByProject.get(project.id) ?? null }));
 
-  return <PortfolioRenderer creator={creator} site={site} projects={projectsWithCovers} definition={template.definition} />;
+  return <PortfolioRenderer creator={creator} site={site} projects={projectsWithCovers} definition={template.definition} sitePages={publishedPages ?? []} />;
 }
