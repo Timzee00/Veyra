@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import PageBlocks from "@/components/builder/PageBlocks";
-import { createPageBlock, makeSectionKit, PAGE_BLOCK_KINDS, pageDocumentIsValid, safeSiteUrl, SECTION_KITS } from "@/platform/builder/page-model";
+import { createPageBlock, makeSectionKit, PAGE_BLOCK_KINDS, pageDocumentIsValid, SECTION_KITS } from "@/platform/builder/page-model";
 import type { PageBlock, PageBlockKind, PageDocument } from "@/platform/builder/page-model";
 
 type Page = { id: string; creator_id: string; slug: string; title: string; seo_description: string | null; revision: number; draft_blocks: unknown };
