@@ -25,7 +25,7 @@ export function auditPage(title: string, description: string, blocks: unknown): 
     if (block.type === "heading" && text.toLowerCase().includes("your next great headline")) errors.push("Replace the example heading before publishing.");
     if (block.type === "paragraph" && text.toLowerCase().includes("write something helpful")) errors.push("Replace the example paragraph before publishing.");
     if (block.type === "quote" && text.toLowerCase().includes("add a genuine quote")) errors.push("Replace the testimonial example with genuine, approved wording.");
-    if (block.type === "faq" && (!String(block.props.question ?? "").trim() || !String(block.props.answer ?? "").trim())) errors.push("Fill in both the question and answer of each FAQ.");
+    if (block.type === "faq" && (!String(block.props.question ?? "").trim() || !String(block.props.answer ?? "").trim() || String(block.props.question ?? "").toLowerCase() === "a question your visitors ask" || String(block.props.answer ?? "").toLowerCase() === "give a clear, useful answer.")) errors.push("Replace FAQ sample questions and answers with real information.");
     if (block.type === "button" && !text.trim()) errors.push("Label each button so visitors know what it does.");
   }
   return { errors: Array.from(new Set(errors)), recommendations: Array.from(new Set(recommendations)) };
