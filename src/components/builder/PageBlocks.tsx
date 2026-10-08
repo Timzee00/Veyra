@@ -4,7 +4,7 @@ import { safeSiteUrl, pageDocumentIsValid } from "@/platform/builder/page-model"
 function RenderBlock({ block, siteBasePath }: { block: PageBlock; siteBasePath?: string }) {
   const text = typeof block.props.text === "string" ? block.props.text : "";
   const url = typeof block.props.url === "string" && safeSiteUrl(block.props.url) ? block.props.url : "";
-  const href = !url || url.startsWith("https://") || !siteBasePath ? url : url === "/" ? siteBasePath : `${siteBasePath}/pages/${url.replace(/^\\/(pages\\/)?/, "")}`;
+  const href = !url || url.startsWith("https://") || !siteBasePath ? url : url === "/" ? siteBasePath : `${siteBasePath}/pages/${url.startsWith("/pages/") ? url.slice(7) : url.slice(1)}`;
   switch (block.type) {
     case "heading": return <h2 className="vpage-heading">{text}</h2>;
     case "paragraph": return <p className="vpage-paragraph">{text}</p>;
