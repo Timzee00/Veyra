@@ -14,7 +14,7 @@ export default async function SettingsPage() {
     <aside className="dashboard-sidebar" aria-label="Creator workspace">
       <Link className="dashboard-brand" href="/">V<span>V</span> VEYRA</Link>
       <div className="dashboard-context"><span>CREATOR SPACE</span><strong>{creator.display_name}</strong><small>@{creator.handle}</small></div>
-      <nav className="dashboard-nav"><Link href="/dashboard">Overview</Link><Link href="/dashboard/pages">Website pages</Link><Link href="/dashboard/projects">Projects</Link><Link href="/dashboard/profile">Profile</Link><Link href="/dashboard/appearance">Appearance</Link><Link href="/dashboard/analytics">Analytics</Link><Link className="active" href="/dashboard/settings">Settings</Link></nav>
+      <nav className="dashboard-nav"><Link href="/dashboard">Overview</Link><Link href="/dashboard/homepage">Homepage</Link><Link href="/dashboard/pages">Website pages</Link><Link href="/dashboard/projects">Projects</Link><Link href="/dashboard/profile">Profile</Link><Link href="/dashboard/appearance">Appearance</Link><Link href="/dashboard/analytics">Analytics</Link><Link className="active" href="/dashboard/settings">Settings</Link></nav>
     </aside>
     <section className="dashboard-main narrow-main">
       <header className="dashboard-topbar"><div><p className="eyebrow">YOUR VEYRA ACCOUNT</p><h1>Account & security.</h1></div><Link href="/dashboard">Back to dashboard</Link></header>
