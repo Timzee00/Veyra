@@ -170,7 +170,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
       <section className="vstudio-canvas">
         <div className="vstudio-canvas-toolbar"><span>PAGE PREVIEW · {count} ELEMENTS</span><div role="group" aria-label="Preview width">{(["desktop","tablet","mobile"] as const).map(size=><button type="button" key={size} aria-pressed={device===size} onClick={()=>setDevice(size)}>{size}</button>)}</div></div>
         <div className={`vstudio-viewport viewport-${device}`}><div className="vstudio-preview-paper"><div className="vstudio-preview-nav"><strong>{creatorHandle}</strong><span>Home · {title}</span></div>
-          <PageBlocks blocks={blocks}/>
+          <PageBlocks blocks={blocks} siteBasePath={`/creator/${creatorHandle}`}/>
           {!blocks.length && <div className="vstudio-start"><h2>Your canvas is ready.</h2><p>Choose an element or a section on the left. The page will update instantly.</p></div>}
           <footer>Powered by Timzee Corp</footer>
         </div></div>
