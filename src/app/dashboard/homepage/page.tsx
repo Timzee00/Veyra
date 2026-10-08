@@ -14,7 +14,7 @@ export default async function HomepageStudio() {
   if (!creator) redirect("/onboarding");
   const [{ data: site }, { data: pageDraft }] = await Promise.all([
     supabase.from("creator_sites").select("visibility").eq("creator_id",creator.id).maybeSingle(),
-    supabase.from("creator_page_drafts").select("blocks").eq("creator_id",creator.id).maybeSingle(),
+    supabase.from("creator_page_drafts").select("blocks, revision").eq("creator_id",creator.id).maybeSingle(),
   ]);
   return <main className="dashboard-shell">
     <aside className="dashboard-sidebar">
@@ -25,7 +25,7 @@ export default async function HomepageStudio() {
     <section className="dashboard-main narrow-main">
       <header className="dashboard-topbar"><div><p className="eyebrow">VEYRA STUDIO / HOME</p><h1>Edit your homepage.</h1></div><Link href="/dashboard/pages">Other pages →</Link></header>
       <p className="vpage-studio-note">Your homepage continues to use your chosen portfolio template. Build additional standalone pages in Website pages.</p>
-      <PageBlockEditor creatorId={creator.id} initialBlocks={pageDraft?.blocks ?? []} visible={site?.visibility==="published"} />
+      <PageBlockEditor creatorId={creator.id} initialBlocks={pageDraft?.blocks ?? []} initialRevision={pageDraft?.revision ?? 0} visible={site?.visibility==="published"} />
     </section>
   </main>;
 }
