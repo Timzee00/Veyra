@@ -48,7 +48,7 @@ export default async function CreatorPage({ params }: { params: Promise<{ handle
 
   const { data: site } = await supabase
     .from("creator_sites")
-    .select("title, seo_description, visibility, template_id, template_version_id, design_published")
+    .select("title, seo_description, visibility, template_id, template_version_id, design_published, builder_published")
     .eq("creator_id", creator.id)
     .maybeSingle();
   if (site?.visibility !== "published") notFound();
