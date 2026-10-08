@@ -23,7 +23,7 @@ async function getDiscoveryData() {
   }
 }
 
-const categories = ["Graphic Design", "Branding", "Photography", "UI / UX", "Motion", "Illustration", "Film", "Creative Direction"];
+const categories = ["Design", "Photography", "Fashion", "Art", "Writing", "Technology", "Business", "Music", "Education"];
 
 export default async function Home() {
   const { creators, projects, posts } = await getDiscoveryData();
@@ -49,7 +49,7 @@ export default async function Home() {
 
       <section className="discover-section" aria-labelledby="creators-title">
         <div className="discover-heading"><div><p className="eyebrow">01 / PEOPLE</p><h2 id="creators-title">Creators to know.</h2></div><Link href="/explore?type=creators">View all creators ↗</Link></div>
-        <div className="creator-discover-grid">{creators.map((creator) => <Link className="creator-discover-card" href={`/creator/${creator.handle}`} key={creator.id}><div className="creator-avatar">{creator.avatar_path ? <span aria-hidden="true">●</span> : <span>{creator.display_name.slice(0, 1).toUpperCase()}</span>}</div><div><h3>{creator.display_name}</h3><p>{creator.category || "Independent creator"}{creator.location ? ` · ${creator.location}` : ""}</p><small>@{creator.handle}</small></div>{creator.featured && <strong>Featured</strong>}</Link>)}{creators.length === 0 && <div className="discover-empty">Creator discovery will populate as creators publish their Veyra sites.</div>}</div>
+        <div className="creator-discover-grid">{creators.map((creator) => <Link className="creator-discover-card" href={`/u/${creator.handle}`} key={creator.id}><div className="creator-avatar">{creator.avatar_path ? <span aria-hidden="true">●</span> : <span>{creator.display_name.slice(0, 1).toUpperCase()}</span>}</div><div><h3>{creator.display_name}</h3><p>{creator.category || "Independent creator"}{creator.location ? ` · ${creator.location}` : ""}</p><small>@{creator.handle}</small></div>{creator.featured && <strong>Editor’s pick</strong>}</Link>)}{creators.length === 0 && <div className="discover-empty">Creator discovery will populate as creators publish their Veyra sites.</div>}</div>
       </section>
 
       <section className="discover-section" aria-labelledby="projects-title">
