@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
-
-const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+import { resolveSiteOrigin, shouldAvoidIndexing } from "@/platform/seo/site-config";
 
 export default function robots(): MetadataRoute.Robots {
+  if (shouldAvoidIndexing(process.env)) {
+    return { rules: [{ userAgent: "*", disallow: "/" }] };
+  }
+  const origin = resolveSiteOrigin(process.env);
   return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/dashboard", "/admin"] }],
-    sitemap: `${baseUrl}/sitemap.xml`,
+    rules: [{ userAgent: "*", allow: "/", disallow: ["/dashboard", "/admin", "/login", "/signup", "/onboarding", "/reset-password"] }],
+    sitemap: `${origin}/sitemap.xml`,
   };
 }
