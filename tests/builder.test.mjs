@@ -5,7 +5,7 @@ import { createPageBlock, makeSectionKit, pageDocumentIsValid, safeSiteUrl, SECT
 test("safe links allow internal routes and HTTPS, never script, protocol-relative, or insecure URLs", () => {
   for (const url of ["/", "/contact", "/pages/about", "https://example.com/path?q=1"])
     assert.equal(safeSiteUrl(url), true, url);
-  for (const url of ["javascript:alert(1)", "//evil.example", "http://insecure.example", "data:text/html,evil", "/bad path"])
+  for (const url of ["javascript:alert(1)", "//evil.example", "http://insecure.example", "data:text/html,evil", "/bad path", "/\\\\evil", "https://user:pass@example.com", "https://", "https:///?q=1"])
     assert.equal(safeSiteUrl(url), false, url);
 });
 
