@@ -9,7 +9,7 @@ import type { PageDocument } from "@/platform/builder/page-model";
 type SavedKit = {
  id: string;
  name: string;
- blocks: unknown;
+ block_count: number;
  created_at: string;
 };
 type Props = {
@@ -36,7 +36,7 @@ export default function SavedSectionLibrary({creatorId,blocks,selectedId,busy,on
   async function load(){
    setLoading(true);setError("");
    const {data,error:loadError}=await createSupabaseBrowserClient()
-     .from("site_section_library").select("id,name,blocks,created_at")
+     .from("site_section_library").select("id,name,block_count,created_at")
      .eq("creator_id",creatorId).order("created_at",{ascending:false}).limit(24);
    if(!active)return;
    if(loadError)setError("Could not load saved sections. Check that the section-library migration is installed.");
@@ -61,7 +61,7 @@ export default function SavedSectionLibrary({creatorId,blocks,selectedId,busy,on
    const safeBlocks=importSectionBundle(exportSectionBundle(content),()=>crypto.randomUUID());
    const {data,error:insertError}=await createSupabaseBrowserClient().from("site_section_library")
      .insert({creator_id:creatorId,name:kitName,blocks:safeBlocks})
-     .select("id,name,blocks,created_at").single();
+     .select("id,name,block_count,created_at").single();
    if(insertError||!data)throw new Error(insertError?.message??"Could not save this section.");
    setItems(prev=>[data as SavedKit,...prev].slice(0,24));setName("");
    setNotice("Saved to your private library. You can reuse it across your pages.");
@@ -69,15 +69,21 @@ export default function SavedSectionLibrary({creatorId,blocks,selectedId,busy,on
   finally{setSaving(false);}
  }
 
- function insert(kit:SavedKit){
-  setError("");setNotice("");
+ async function insert(kit:SavedKit){
+  if(busy||saving)return;
+  setError("");setNotice("");setSaving(true);
   try{
-   if(!pageDocumentIsValid(kit.blocks)||!kit.blocks.length)throw new Error("This saved section is invalid.");
-   const imported=importSectionBundle(exportSectionBundle(kit.blocks),()=>crypto.randomUUID());
-   if(blocks.length+imported.length>80)throw new Error("Importing this section would exceed the page's 80-element limit.");
+   if(blocks.length+kit.block_count>80)throw new Error("Importing this section would exceed the page's 80-element limit.");
+   const {data,error:fetchError}=await createSupabaseBrowserClient()
+     .from("site_section_library").select("blocks")
+     .eq("creator_id",creatorId).eq("id",kit.id).single();
+   if(fetchError||!data||!pageDocumentIsValid(data.blocks)||!data.blocks.length)
+    throw new Error("This saved section could not be loaded or has invalid content.");
+   const imported=importSectionBundle(exportSectionBundle(data.blocks),()=>crypto.randomUUID());
    onInsert(imported);
    setNotice(`Added "${kit.name}" to your private draft. Save your page to keep the change.`);
   }catch(caught){setError(caught instanceof Error?caught.message:"Unable to insert saved sections.");}
+  finally{setSaving(false);}
  }
 
  async function remove(kit:SavedKit){
@@ -106,7 +112,7 @@ export default function SavedSectionLibrary({creatorId,blocks,selectedId,busy,on
      {!loading&&!items.length&&<p>Your library is empty. Select an element or build a page, give it a name, and save it.</p>}
      <ul className="vstudio-library-items">{items.map(kit=><li key={kit.id}>
        <strong>{kit.name}</strong>
-       <small>{Array.isArray(kit.blocks)?kit.blocks.length:0} elements</small>
+       <small>{kit.block_count} elements</small>
        <div className="vstudio-library-actions">
         <button type="button" disabled={busy||saving} onClick={()=>insert(kit)}>Insert</button>
         <button type="button" disabled={busy||saving} onClick={()=>void remove(kit)} aria-label={`Delete saved section ${kit.name}`}>Delete</button>
