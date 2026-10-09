@@ -1,5 +1,5 @@
-import { pageDocumentIsValid } from "./page-model";
-import type { PageDocument } from "./page-model";
+import { pageDocumentIsValid } from "./page-model.ts";
+import type { PageDocument } from "./page-model.ts";
 
 // Portable, strictly validated section bundles. Content is data, never executable code.
 export const SECTION_BUNDLE_FORMAT = "veyra.sections.v1";
