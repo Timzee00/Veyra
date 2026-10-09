@@ -21,11 +21,15 @@ Veyra is a modular portfolio and creator platform designed to grow from a premiu
 - React
 - PostgreSQL through Supabase
 - Supabase Auth + Storage + Row Level Security
-- Vercel for deployment
+- A Next.js-capable server host for deployment (hosting provider is deliberately not locked in)
 
-## Current foundation
+## Actual development status
 
-The initial application contains the Veyra public shell and visual language. The deeper platform is being built as independent domains under `src/modules` and shared infrastructure under `src/platform`.
+This is an **unreleased development product**, not a production-ready website builder. The current branch contains authentication flows, creator profiles and portfolio presentation, a homepage content editor, a multi-page drag-to-reorder editor, section bundles and a private saved-section library, owner-scoped publishing, plus private recovery from up to 30 published page versions.
+
+Planned but **not launch-ready**: live payment reconciliation, paid custom domains, AI website generation, shared agency collaboration, end-to-end media management, full responsive drag-and-drop layout controls, and large-scale capacity evidence. Do not expose mock or gated features as working services.
+
+The repo has not passed a complete local TypeScript/build/browser verification gate yet. The dedicated Supabase staging project has had database migrations and seeds applied and a rollback-only page history / tenant-ownership SQL test executed successfully.
 
 ## Architecture
 
@@ -60,6 +64,17 @@ supabase/
 docs/
 └── ARCHITECTURE.md
 ```
+
+## Reproduce the environment
+
+1. Use **Node.js 22 or later** and run `npm ci`.
+2. Set the variables documented in `.env.example`, using credentials for a **dedicated** Veyra Supabase project. Never commit secrets.
+3. Apply the ordered SQL in `supabase/migrations/` to an empty **staging** project. Apply required seed data `supabase/seed/0001_catalog.sql` and `0002_templates.sql` **after** migrations; optional `0003_blog.sql` loads sample editorial content. Skipping the seeds prevents creator onboarding and template selection.
+4. Run `npm run typecheck`, `npm run lint`, `npm run test:builder`, and `npm run build`. These checks do not require GitHub Actions or Netlify.
+5. Against staging only, run `tests/db/page-history-smoke.sql` with a trusted database SQL editor. This test creates temporary fixtures inside a transaction and rolls them all back.
+6. Manually verify desktop/mobile, sign-up, profile, page authoring, publishing, unpublishing, unauthorized cross-account access, redirects, accessibility and media handling before merging or deploying.
+
+See [Supabase setup](docs/NEW_SUPABASE_PROJECT_SETUP.md), [launch gates](docs/BUILDER_RELEASE_GATES.md), and [operational/acquisition standards](docs/ACQUISITION_AND_OPERATIONS_READINESS.md).
 
 ## Development rule
 
