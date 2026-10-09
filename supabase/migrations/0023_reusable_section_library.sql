@@ -6,6 +6,7 @@ create table public.site_section_library (
   creator_id uuid not null references public.creator_accounts(id) on delete cascade,
   name text not null,
   blocks jsonb not null,
+  block_count integer generated always as (jsonb_array_length(blocks)) stored,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint site_section_name_length check (length(btrim(name)) between 1 and 80),
