@@ -108,3 +108,15 @@
 .vstudio-library-items small{font-size:10px;color:#b9afc9}
 .vstudio-saved-library [role="alert"]{overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.vstudio-saved-library *{transition:none!important}}
+
+/* Site version history: recovery is explicitly a private-draft operation. */
+.vstudio-version-history{margin:28px 0 6px;padding:18px;border:1px solid #ffffff25;border-radius:14px;background:#121827}
+.vstudio-version-history>button{font-weight:700}
+.vstudio-version-history>div{display:grid;gap:13px;margin-top:16px}
+.vstudio-version-history p{font-size:12px;color:#c9c4d2;line-height:1.6;max-width:750px;margin:0}
+.vstudio-version-history ol{list-style:none;display:grid;gap:10px;margin:0;padding:0}
+.vstudio-version-history li{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#202438;padding:12px;border:1px solid #ffffff21;border-radius:10px}
+.vstudio-version-history li>div{display:grid;gap:5px;min-width:0}
+.vstudio-version-history strong{font-size:13px;color:#f9f3ff}
+.vstudio-version-history small{font-size:11px;color:#b9b4c7;overflow-wrap:anywhere}
+.vstudio-version-history [role="alert"]{color:#ffcfcb}
