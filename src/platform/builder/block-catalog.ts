@@ -5,7 +5,7 @@
 export const BLOCK_CATEGORIES = ["Essentials","Media","Conversion","Business","Content"] as const;
 export type BlockCategory = typeof BLOCK_CATEGORIES[number];
 export type BlockType =
- | "section" | "heading" | "paragraph" | "button" | "image" | "divider"
+ | "section" | "heading" | "paragraph" | "button" | "image" | "divider" | "quote" | "spacer"
  | "gallery" | "video" | "contact_form" | "newsletter_form"
  | "service_list" | "testimonials" | "faq" | "pricing" | "map"
  | "article_list" | "project_list";
@@ -21,6 +21,7 @@ export const BLOCK_LIBRARY:readonly BlockDefinition[]=[
  {type:"paragraph",category:"Essentials",label:"Text",description:"Rich text and descriptions",allowedFor:ALL,premium:false},
  {type:"button",category:"Essentials",label:"Button",description:"Call-to-action linking to a page or URL",allowedFor:ALL,premium:false},
  {type:"divider",category:"Essentials",label:"Divider",description:"Separate sections cleanly",allowedFor:ALL,premium:false},
+ {type:"spacer",category:"Essentials",label:"Spacer",description:"Control vertical breathing room between elements",allowedFor:ALL,premium:false},
  {type:"image",category:"Media",label:"Image",description:"Optimized image and accessible description",allowedFor:ALL,premium:false},
  {type:"gallery",category:"Media",label:"Gallery",description:"Responsive image galleries",allowedFor:ALL,premium:false},
  {type:"video",category:"Media",label:"Video",description:"Responsive video with poster fallback",allowedFor:ALL,premium:false},
@@ -31,6 +32,7 @@ export const BLOCK_LIBRARY:readonly BlockDefinition[]=[
  {type:"pricing",category:"Business",label:"Pricing",description:"Present clearly labelled offerings",allowedFor:["business","portfolio","store"],premium:false},
  {type:"map",category:"Business",label:"Location",description:"Display an address and opening information",allowedFor:["business","organization","store"],premium:false,requiresIntegration:"maps"},
  {type:"faq",category:"Content",label:"FAQ",description:"Answers to common customer questions",allowedFor:ALL,premium:false},
+ {type:"quote",category:"Content",label:"Quote",description:"A genuine quotation or testimonial",allowedFor:ALL,premium:false},
  {type:"article_list",category:"Content",label:"Articles",description:"Publish content collection cards",allowedFor:["blog","business","organization","portfolio"],premium:false,requiresIntegration:"cms"},
  {type:"project_list",category:"Content",label:"Projects",description:"Showcase published portfolio work",allowedFor:["portfolio","business"],premium:false,requiresIntegration:"projects"}
 ];
