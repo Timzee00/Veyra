@@ -1,20 +1,22 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 type Design = { accent:string; font:"sans"|"serif"|"mono"; motion:"none"|"subtle"|"smooth"; radius:"sharp"|"soft"|"rounded"; heroAlignment:"left"|"center" };
 const defaults:Design={accent:"#bca8ff",font:"sans",motion:"subtle",radius:"soft",heroAlignment:"left"};
 function normalize(v:unknown):Design { const d=(v&&typeof v==="object"&&!Array.isArray(v)?v:{}) as Record<string,unknown>;return {accent:typeof d.accent==="string"&&/^#[0-9a-fA-F]{6}$/.test(d.accent)?d.accent:defaults.accent,font:d.font==="serif"||d.font==="mono"?d.font:"sans",motion:d.motion==="none"||d.motion==="smooth"?d.motion:"subtle",radius:d.radius==="sharp"||d.radius==="rounded"?d.radius:"soft",heroAlignment:d.heroAlignment==="center"?"center":"left"}; }
-export default function VisualSiteEditor({creatorId,creatorName,initialDraft,initialPublished,visible}:{creatorId:string;creatorName:string;initialDraft:unknown;initialPublished:unknown;visible:boolean}) {
+export default function VisualSiteEditor({creatorId,creatorName,initialDraft,initialPublished,initialRevision,visible}:{creatorId:string;creatorName:string;initialDraft:unknown;initialPublished:unknown;initialRevision:number;visible:boolean}) {
  const initial=normalize(initialDraft);
  const [design,setDesign]=useState<Design>(initial);
  const [saved,setSaved]=useState<Design>(initial);
  const [published,setPublished]=useState<Design>(normalize(initialPublished));
+ const [revision,setRevision]=useState(initialRevision);
  const [device,setDevice]=useState<"desktop"|"tablet"|"mobile">("desktop");
  const [busy,setBusy]=useState<"save"|"publish"|null>(null);
  const [error,setError]=useState("");
  const [notice,setNotice]=useState("");
  const changed=useMemo(()=>JSON.stringify(design)!==JSON.stringify(saved),[design,saved]);
  function update<K extends keyof Design>(key:K,value:Design[K]){setDesign(p=>({...p,[key]:value}));setNotice("");}
+ useEffect(()=>{const onLeave=(event:BeforeUnloadEvent)=>{if(changed){event.preventDefault();event.returnValue="";}};window.addEventListener("beforeunload",onLeave);return()=>window.removeEventListener("beforeunload",onLeave);},[changed]);
  async function persist(publish:boolean){
   setBusy(publish?"publish":"save");setError("");setNotice("");
   try{
@@ -24,16 +26,22 @@ export default function VisualSiteEditor({creatorId,creatorName,initialDraft,ini
    // Owner check: RLS remains authoritative for the actual write.
    const {data:owner,error:ownerError}=await db.from("creator_accounts").select("id").eq("id",creatorId).eq("owner_user_id",user.id).maybeSingle();
    if(ownerError||!owner)throw new Error("Only the website owner can change the design.");
-   const {error:saveError}=await db.from("creator_site_design_drafts").upsert({creator_id:creatorId,design},{onConflict:"creator_id"});
+   const {data:nextRevision,error:saveError}=await db.rpc("veyra_save_design_draft",{target_creator:creatorId,expected_revision:revision,next_design:design});
    if(saveError)throw saveError;
-   if(publish){const {error:publishError}=await db.rpc("veyra_publish_design",{target_creator:creatorId});if(publishError)throw publishError;}
-   setSaved(design);if(publish)setPublished(design);
-   setNotice(publish?"Design applied to your website.":"Draft saved. Your live website has not changed.");
+   if(!Number.isInteger(nextRevision))throw new Error("Could not verify the saved design revision.");
+   setRevision(nextRevision as number);
+   setSaved(design);
+   if(publish){
+     const {error:publishError}=await db.rpc("veyra_publish_design",{target_creator:creatorId,expected_revision:nextRevision});
+     if(publishError)throw publishError;
+     setPublished(design);
+   }
+   setNotice(publish?"Design applied to your website.":"Draft saved privately. Your live website has not changed.");
   }catch(e){setError(e instanceof Error?e.message:"Could not save your design.");}
   finally{setBusy(null);}
  }
  return <section className="visual-builder" aria-label="Website design editor">
-  <header className="visual-builder-header"><div><p className="eyebrow">VEYRA DESIGN STUDIO</p><h2>Make it yours.</h2><p>Refine your website, preview across devices, and publish your design only when you're happy.</p></div><div className="visual-builder-actions"><span aria-live="polite">{changed?"Unsaved changes":busy?"Working…":"All changes saved"}</span><button type="button" disabled={!!busy||!changed} onClick={()=>{setDesign(saved);setError("");setNotice("");}}>Discard</button><button type="button" disabled={!!busy||!changed} onClick={()=>persist(false)}>Save draft</button><button type="button" className="visual-builder-publish" disabled={!!busy||!visible} onClick={()=>persist(true)}>Apply to live website ↗</button></div></header>
+  <header className="visual-builder-header"><div><p className="eyebrow">VEYRA DESIGN STUDIO</p><h2>Make it yours.</h2><p>Refine your website, preview across devices, and publish your design only when you're happy.</p></div><div className="visual-builder-actions"><span aria-live="polite">{busy?"Working…":changed?"Unsaved changes":"All changes saved"}</span><button type="button" disabled={!!busy||!changed} onClick={()=>{setDesign(saved);setError("");setNotice("");}}>Discard</button><button type="button" disabled={!!busy||!changed} onClick={()=>persist(false)}>Save draft</button><button type="button" className="visual-builder-publish" disabled={!!busy||!visible} onClick={()=>persist(true)}>Apply to live website ↗</button></div></header>
   {!visible&&<p className="visual-builder-warning">Your site is not published yet. You can save your design draft, then publish your site from Profile.</p>}
   <div className="visual-builder-workspace">
    <aside className="visual-builder-inspector"><h3>Design controls</h3>
