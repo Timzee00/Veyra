@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:builder": "node --experimental-strip-types --test tests/builder.test.mjs",
+    "test:builder": "node --experimental-strip-types --test tests/*.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
