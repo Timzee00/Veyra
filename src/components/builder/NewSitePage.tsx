@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { makeUniquePageSlug } from "@/platform/builder/page-slug";
 
 export default function NewSitePage({ creatorId, pageCount }: { creatorId: string; pageCount: number }) {
   const router = useRouter();
@@ -18,8 +19,7 @@ export default function NewSitePage({ creatorId, pageCount }: { creatorId: strin
     setBusy(true);
     try {
       const client = createSupabaseBrowserClient();
-      const slugBase = pageTitle.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s-]/g, "").trim().replace(/[\s-]+/g, "-").slice(0, 48).replace(/-+$/, "") || "page";
-      const slug = `${slugBase}-${crypto.randomUUID().slice(0, 6)}`;
+      const slug = makeUniquePageSlug(pageTitle, crypto.randomUUID().slice(0, 8));
       const { data, error: insertError } = await client.from("site_pages")
         .insert({ creator_id: creatorId, title: pageTitle, slug, draft_blocks: [] })
         .select("id").single();
