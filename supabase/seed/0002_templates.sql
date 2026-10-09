@@ -21,11 +21,7 @@ values
     '{"schemaVersion":1,"layout":{"variant":"immersive","maxWidth":1440,"navigation":"overlay"},"sections":[{"type":"hero","variant":"visual"},{"type":"featured_project","variant":"full-bleed"},{"type":"projects","variant":"masonry"},{"type":"about","variant":"cinematic"},{"type":"contact","variant":"cta"}],"designTokens":{"motion":"cinematic","radius":24},"responsive":{"mobileColumns":1,"tabletColumns":2,"desktopColumns":3},"capabilities":["colors","typography","gradients","spacing","radius","shadows","backgrounds","motion","custom_sections","advanced_layout"]}'::jsonb,
     'Initial Cinema release.', now()
   )
-on conflict (template_id, version) do update set
-  status = excluded.status,
-  definition = excluded.definition,
-  release_notes = excluded.release_notes,
-  published_at = excluded.published_at;
+on conflict (template_id,version) do nothing; -- published template versions are immutable
 
 insert into public.design_presets (key, name, description, preset_type, tokens, premium)
 values
@@ -65,6 +61,4 @@ insert into public.template_versions(template_id,version,status,definition,relea
 ('agency','1.0.0','active',
  '{"schemaVersion":1,"layout":{"variant":"agency","maxWidth":1320},"sections":[{"type":"hero","variant":"agency"},{"type":"projects","variant":"case-studies"},{"type":"services","variant":"list"},{"type":"contact","variant":"cta"}],"designTokens":{"radius":14,"motion":"smooth"},"responsive":{"mobileColumns":1,"tabletColumns":2,"desktopColumns":2},"capabilities":["colors","typography","gradients","spacing","radius","shadows","backgrounds","motion","custom_sections","advanced_layout"]}'::jsonb,
  'Initial Agency release.',now())
-on conflict (template_id,version) do update set
- status=excluded.status,
- release_notes=excluded.release_notes;
+on conflict (template_id,version) do nothing; -- never overwrite a pinned version
