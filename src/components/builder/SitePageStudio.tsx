@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import PageBlocks from "@/components/builder/PageBlocks";
+import { exportSectionBundle, importSectionBundle } from "@/platform/builder/section-bundle";
 import { auditPage } from "@/platform/builder/page-audit";
 import { createPageBlock, makeSectionKit, PAGE_BLOCK_KINDS, pageDocumentIsValid, SECTION_KITS } from "@/platform/builder/page-model";
 import type { PageBlock, PageBlockKind, PageDocument } from "@/platform/builder/page-model";
@@ -30,6 +31,8 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
   const [publishedSlug, setPublishedSlug] = useState(initialPublishedSlug);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [bundleText, setBundleText] = useState("");
+  const [showBundles, setShowBundles] = useState(false);
 
   const dirty = saved !== JSON.stringify({ blocks, title, slug, description });
   const selected = blocks.find(item => item.id === selectedId) ?? null;
@@ -93,6 +96,32 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     setPast(items => [...items.slice(-29), blocks]);
     setBlocks(future[0]);
     setFuture(items => items.slice(1));
+  }
+
+  async function copySections() {
+    try {
+      if (!blocks.length) throw new Error("Add page content before copying.");
+      const value = exportSectionBundle(blocks);
+      await navigator.clipboard.writeText(value);
+      setMessage("Page sections copied. Paste the bundle into another Veyra page to reuse them.");
+      setError("");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not copy sections.");
+    }
+  }
+  function appendSections() {
+    try {
+      const imported = importSectionBundle(bundleText, () => crypto.randomUUID());
+      if (blocks.length + imported.length > 80) throw new Error("This page cannot exceed 80 elements.");
+      edit([...blocks, ...imported]);
+      setSelectedId(imported[0]?.id ?? null);
+      setBundleText("");
+      setShowBundles(false);
+      setError("");
+      setMessage("Sections added to your private draft. Save the draft to keep them.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not import sections.");
+    }
   }
 
   async function saveDraft(): Promise<number | null> {
@@ -180,7 +209,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     <div className="vstudio-workspace">
       <aside className="vstudio-library"><h2>Elements</h2><div className="vstudio-element-grid">
         {PAGE_BLOCK_KINDS.map(kind=><button type="button" key={kind} onClick={()=>add(kind)} disabled={count>=80||busy}>+ {kind === "faq" ? "FAQ" : kind[0].toUpperCase()+kind.slice(1)}</button>)}
-      </div><h2>Ready-made sections</h2>{SECTION_KITS.map(kit=><button type="button" className="vstudio-kit" key={kit.title} onClick={()=>addKit(kit.blocks)} disabled={count+kit.blocks.length>80||busy}><strong>{kit.title}</strong><small>{kit.description}</small></button>)}<p>Start with safe, responsive sections. No coding or paid AI required.</p></aside>
+      </div><h2>Ready-made sections</h2>{SECTION_KITS.map(kit=><button type="button" className="vstudio-kit" key={kit.title} onClick={()=>addKit(kit.blocks)} disabled={count+kit.blocks.length>80||busy}><strong>{kit.title}</strong><small>{kit.description}</small></button>)}<p>Start with safe, responsive sections. No coding or paid AI required.</p><h2>Reusable sections</h2><p>Copy sections from this page and reuse them in another page. Imported elements receive new IDs and are private until published.</p><button type="button" className="vstudio-kit" disabled={!blocks.length||busy} onClick={()=>void copySections()}>Copy all page sections</button><button type="button" className="vstudio-kit" onClick={()=>setShowBundles(v=>!v)}>{showBundles?"Close import":"Import section bundle"}</button>{showBundles&&<div className="vstudio-bundle-import"><label>Paste Veyra section bundle<textarea rows={5} value={bundleText} onChange={e=>setBundleText(e.target.value)} maxLength={400000} placeholder="Paste copied JSON here" /></label><button type="button" disabled={!bundleText.trim()||busy} onClick={appendSections}>Add sections to draft</button></div>}</aside>
       <section className="vstudio-canvas">
         <div className="vstudio-canvas-toolbar"><span>PAGE PREVIEW · {count} ELEMENTS</span><div role="group" aria-label="Preview width">{(["desktop","tablet","mobile"] as const).map(size=><button type="button" key={size} aria-pressed={device===size} onClick={()=>setDevice(size)}>{size}</button>)}</div></div>
         <div className={`vstudio-viewport viewport-${device}`}><div className="vstudio-preview-paper"><div className="vstudio-preview-nav"><strong>{creatorHandle}</strong><span>Home · {title}</span></div>
