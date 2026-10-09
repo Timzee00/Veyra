@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { pageSlugIsValid } from "@/platform/builder/page-slug";
 import PageBlocks from "@/components/builder/PageBlocks";
 import PageVersionHistory from "@/components/builder/PageVersionHistory";
 import SavedSectionLibrary from "@/components/builder/SavedSectionLibrary";
@@ -51,7 +52,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
   const contentErrors = useMemo(() => {
     const issues: string[] = [];
     if (!pageDocumentIsValid(blocks)) issues.push("Some blocks have invalid content or unsafe URLs.");
-    if (!/^[a-z][a-z0-9-]{0,62}$/.test(slug) || ["project","post","pages","api","opengraph-image"].includes(slug)) issues.push("Use a simple page address containing lowercase letters, numbers or hyphens.");
+    if (!pageSlugIsValid(slug)) issues.push("Use a simple page address containing lowercase letters, numbers or hyphens.");
     if (!title.trim() || title.length > 110) issues.push("Page titles must contain 1–110 characters.");
     if (description.length > 300) issues.push("The SEO description must be 300 characters or fewer.");
     return issues;
