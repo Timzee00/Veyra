@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import PageBlocks from "@/components/builder/PageBlocks";
+import PageVersionHistory from "@/components/builder/PageVersionHistory";
 import SavedSectionLibrary from "@/components/builder/SavedSectionLibrary";
 import { exportSectionBundle, importSectionBundle } from "@/platform/builder/section-bundle";
 import { auditPage } from "@/platform/builder/page-audit";
@@ -251,6 +252,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
         </div>
       </aside>
     </div>
+    <PageVersionHistory pageId={page.id} creatorId={page.creator_id} revision={revision} dirty={dirty} busy={busy} />
     <div className="vstudio-footer-actions"><Link href="/dashboard/pages">← All pages</Link>
       {publicPath && siteLive && <Link href={publicPath} target="_blank">View live page ↗</Link>}
       {publishedSlug && <button type="button" onClick={()=>void unpublish()} disabled={busy}>Unpublish page</button>}
