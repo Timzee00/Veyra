@@ -19,6 +19,7 @@ export function resolveSiteOrigin(env: SiteEnvironment): string {
     env.DEPLOY_PRIME_URL,
     env.VERCEL_URL ? `https://${env.VERCEL_URL}` : undefined,
   ];
+  let localOrigin: string | null = null;
   for (const value of values) {
     if (!value) continue;
     try {
@@ -26,13 +27,14 @@ export function resolveSiteOrigin(env: SiteEnvironment): string {
       const isLocal = url.hostname === "localhost" || url.hostname === "127.0.0.1";
       if ((url.protocol === "https:" || (url.protocol === "http:" && isLocal))
         && url.hostname && !url.username && !url.password) {
-        return url.origin;
+        if (url.protocol === "https:") return url.origin;
+        localOrigin ??= url.origin;
       }
     } catch {
       // Ignore malformed configuration and try the next trusted host value.
     }
   }
-  return "http://localhost:3000";
+  return localOrigin ?? "http://localhost:3000";
 }
 
 export function shouldAvoidIndexing(env: SiteEnvironment): boolean {
