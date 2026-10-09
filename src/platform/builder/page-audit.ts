@@ -1,5 +1,5 @@
-import { pageDocumentIsValid } from "./page-model";
-import type { PageDocument } from "./page-model";
+import { pageDocumentIsValid } from "./page-model.ts";
+import type { PageDocument } from "./page-model.ts";
 
 export type PageAudit = { errors: string[]; recommendations: string[] };
 
