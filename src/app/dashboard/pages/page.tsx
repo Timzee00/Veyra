@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import NewSitePage from "@/components/builder/NewSitePage";
 import DuplicateSitePage from "@/components/builder/DuplicateSitePage";
+import DownloadPageBackup from "@/components/builder/DownloadPageBackup";
 
 export const metadata: Metadata = { title: "Website pages" };
 
@@ -43,6 +44,7 @@ export default async function WebsitePages() {
           </div>
         </article>;
       })}</div>
+      <DownloadPageBackup creatorId={creator.id} creatorHandle={creator.handle} disabled={!!error} />
       <p className="vpage-studio-note">Custom domains are a separate paid feature and are not enabled yet. Your free Veyra website address remains available.</p>
     </section>
   </main>;
