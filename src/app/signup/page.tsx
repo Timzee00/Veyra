@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import AuthForm from "@/components/auth/AuthForm";
 import { VEYRA } from "@/platform/brand/identity";
@@ -16,7 +17,7 @@ export default function SignupPage() {
         <p className="eyebrow">CREATE YOUR SPACE</p>
         <h1>Make your work<br />a destination.</h1>
         <p className="auth-intro">Create your account first. We will guide you through your public creator profile next.</p>
-        <AuthForm mode="signup" />
+        <Suspense fallback={<p role="status" className="auth-intro">Loading registration…</p>}><AuthForm mode="signup" /></Suspense>
         <p className="auth-switch">Already have an account? <Link href="/login">Log in</Link></p>
       <p className="auth-powered">Powered by Timzee Corp</p></div></section>
     </main>
