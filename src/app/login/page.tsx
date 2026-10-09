@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import AuthForm from "@/components/auth/AuthForm";
 
@@ -15,7 +16,7 @@ export default function LoginPage() {
         <p className="eyebrow">CREATOR ACCESS</p>
         <h1>Welcome back.</h1>
         <p className="auth-intro">Sign in to manage your portfolio, projects, identity and creator settings.</p>
-        <AuthForm mode="login" />
+        <Suspense fallback={<p role="status" className="auth-intro">Loading sign-in…</p>}><AuthForm mode="login" /></Suspense>
         <p className="auth-switch">New to Veyra? <Link href="/signup">Create your creator account</Link></p>
       <p className="auth-powered">Powered by Timzee Corp</p></div></section>
     </main>
