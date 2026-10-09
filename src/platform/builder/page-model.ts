@@ -31,7 +31,12 @@ export function pageDocumentIsValid(value: unknown): value is PageDocument {
 
 export function safeSiteUrl(value: string): boolean {
   if (value === "/") return true;
-  return /^https:\/\/[^\s]+$/.test(value) || /^\/(?!\/)[^\s]+$/.test(value);
+  if (/^\/(?!\/)[^\s]*$/.test(value)) return !/[\\\\]/.test(value);
+  if (!/^https:\/\/[^\s]+$/.test(value)) return false;
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "https:" && Boolean(parsed.hostname) && !parsed.username && !parsed.password;
+  } catch { return false; }
 }
 
 export function createPageBlock(type: PageBlockKind): PageBlock {
