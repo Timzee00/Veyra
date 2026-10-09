@@ -6,7 +6,7 @@ import { createPageBlock } from "../src/platform/builder/page-model.ts";
 test("audit flags missing metadata, empty content and invalid documents", () => {
  const result=auditPage("","",[]);
  assert.ok(result.errors.some(issue=>issue.includes("title")));
- assert.ok(result.recommendations.some(issue=>issue.includes("content")));
+ assert.ok(result.errors.some(issue=>issue.includes("content")));
  assert.ok(auditPage("Test","",[{bad:"block"}]).errors.some(issue=>issue.includes("unsupported")));
 });
 
@@ -25,4 +25,13 @@ test("audit recommends informative image descriptions and specific CTAs", () => 
  const result=auditPage("Gallery","A description that explains the website and what a visitor should find.",[image,button]);
  assert.ok(result.recommendations.some(issue=>issue.includes("image")));
  assert.ok(result.recommendations.some(issue=>issue.includes("button")));
+});
+
+test("publishing requires a heading and real page content", () => {
+ const paragraph=createPageBlock("paragraph");
+ paragraph.props.text="We build custom digital products for local businesses.";
+ const result=auditPage("Services","Our team builds websites and digital products for small businesses.",[paragraph]);
+ assert.ok(result.errors.some(issue=>issue.includes("heading")));
+ const withHeading=createPageBlock("heading");withHeading.props.text="Our services";
+ assert.equal(auditPage("Services","Our team builds websites and digital products for small businesses.",[withHeading,paragraph]).errors.length,0);
 });
