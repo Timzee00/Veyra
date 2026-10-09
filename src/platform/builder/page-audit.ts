@@ -12,8 +12,8 @@ export function auditPage(title: string, description: string, blocks: unknown): 
     return { errors, recommendations };
   }
   const document = blocks as PageDocument;
-  if (!document.some(block => block.type === "heading")) recommendations.push("Add a clear heading to explain the purpose of the page.");
-  if (document.length === 0) recommendations.push("Add some content before inviting visitors to this page.");
+  if (!document.some(block => block.type === "heading")) errors.push("Add at least one heading before publishing this page.");
+  if (document.length === 0) errors.push("Add content before publishing this page.");
   if (!description.trim()) recommendations.push("Add a search engine description to help people understand this page.");
   else if (description.length < 50 || description.length > 160) recommendations.push("A search description around 50–160 characters is often easier to display in search results.");
   const headings = document.filter(block => block.type === "heading");
