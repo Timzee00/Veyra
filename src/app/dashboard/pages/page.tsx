@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import NewSitePage from "@/components/builder/NewSitePage";
+import DuplicateSitePage from "@/components/builder/DuplicateSitePage";
 
 export const metadata: Metadata = { title: "Website pages" };
 
@@ -37,7 +38,7 @@ export default async function WebsitePages() {
         const published=liveByPage.get(page.id);
         return <article key={page.id} className="vpage-page-card">
           <div><p className="eyebrow">{published?"PUBLISHED SNAPSHOT":"PRIVATE DRAFT"}</p><h3>{page.title}</h3><p>/pages/{published?.slug??page.slug}</p></div>
-          <div className="vpage-page-actions"><Link href={`/dashboard/pages/${page.id}`}>Edit page →</Link>
+          <div className="vpage-page-actions"><Link href={`/dashboard/pages/${page.id}`}>Edit page →</Link><DuplicateSitePage creatorId={creator.id} pageId={page.id} pageCount={pages?.length??0} />
             {published && site?.visibility === "published" && <Link href={`/creator/${creator.handle}/pages/${published.slug}`} target="_blank">Open live ↗</Link>}
           </div>
         </article>;
