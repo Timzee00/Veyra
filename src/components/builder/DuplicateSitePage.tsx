@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { makeUniquePageSlug } from "@/platform/builder/page-slug";
 
 export default function DuplicateSitePage({creatorId,pageId,pageCount}:{creatorId:string;pageId:string;pageCount:number}){
  const [busy,setBusy]=useState(false);
@@ -15,7 +16,7 @@ export default function DuplicateSitePage({creatorId,pageId,pageCount}:{creatorI
    const {data:source,error:readError}=await db.from("site_pages")
      .select("title,slug,seo_description,draft_blocks").eq("creator_id",creatorId).eq("id",pageId).single();
    if(readError||!source)throw new Error("Could not read the page. Check your permissions.");
-   const slug=source.slug.slice(0,45).replace(/-+$/,"")+"-copy-"+crypto.randomUUID().slice(0,6);
+   const slug = makeUniquePageSlug(source.slug+"-copy",crypto.randomUUID().slice(0,8));
    const {data:copy,error:createError}=await db.from("site_pages")
     .insert({creator_id:creatorId,title:("Copy of "+source.title).slice(0,110),slug,
       seo_description:source.seo_description,draft_blocks:source.draft_blocks})
