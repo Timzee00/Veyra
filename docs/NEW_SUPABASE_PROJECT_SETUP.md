@@ -21,11 +21,14 @@ The repo contains ordered numbered migrations under `supabase/migrations`.
 **Do not run them against a production project without a clean staging trial.**
 1. Provision new Veyra staging database; verify Supabase CLI and CLI migration commands from `supabase --help` and `supabase migration --help`.
 2. Apply migrations in order, inspect errors and any prior history, and run database security advisors.
-3. Test registration, invitation/auth recovery, profile creation, media storage, draft saving, publication, unpublication, site visibility, pages, multi-tab revision conflicts.
-4. Test with two different accounts: one owner must never read or modify another owner's drafts, pages, publications or files.
-5. Confirm published website works with anonymous users; drafts must remain private.
-6. Explicitly test owner-only publish RPCs, authenticated vs anon grants, and role-based policies.
-7. Test image signed-URL expiry, deployment configuration, email redirects and cookies.
+3. **Apply required DML seed files** in order: `supabase/seed/0001_catalog.sql` (plans, creator-owner role and permissions), then `supabase/seed/0002_templates.sql` (all six built-in template records and version definitions). The optional `supabase/seed/0003_blog.sql` loads sample Veyra editorial articles. Run seeds with a trusted SQL client after migration; **migrations alone do not create the required catalog rows**. Without these rows onboarding fails with a template-availability error.
+4. Verify `select id,tier from public.templates order by id;` includes `minimal` and `editorial` as free, and `select id from public.roles where id = 'creator_owner';` returns one row.
+5. Run the rollback-only SQL at `tests/db/page-history-smoke.sql` in an empty staging database to verify history and owner isolation.
+6. Test registration, invitation/auth recovery, profile creation, media storage, draft saving, publication, unpublication, site visibility, pages, multi-tab revision conflicts.
+7. Test with two different accounts: one owner must never read or modify another owner's drafts, pages, publications or files.
+8. Confirm published website works with anonymous users; drafts must remain private.
+9. Explicitly test owner-only publish RPCs, authenticated vs anon grants, and role-based policies.
+10. Test image signed-URL expiry, deployment configuration, email redirects and cookies.
 
 ## Do not enable these until complete
 - Paid custom domains: provider DNS/ownership/SSL verification and entitlement checks not yet integrated.
