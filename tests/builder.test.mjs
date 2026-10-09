@@ -1,6 +1,7 @@
 import test from "node:test";
+import { BLOCK_LIBRARY } from "../src/platform/builder/block-catalog.ts";
 import assert from "node:assert/strict";
-import { createPageBlock, makeSectionKit, pageDocumentIsValid, safeSiteUrl, SECTION_KITS } from "../src/platform/builder/page-model.ts";
+import { createPageBlock, makeSectionKit, pageDocumentIsValid, safeSiteUrl, SECTION_KITS, PAGE_BLOCK_KINDS } from "../src/platform/builder/page-model.ts";
 
 test("safe links allow internal routes and HTTPS, never script, protocol-relative, or insecure URLs", () => {
   for (const url of ["/", "/contact", "/pages/about", "https://example.com/path?q=1"])
@@ -39,3 +40,8 @@ test("supports each permitted block type", () => {
   assert.equal(pageDocumentIsValid(all), true);
 });
 
+
+test("every page-editor block exists in the shared block catalog", () => {
+ const catalog = new Set(BLOCK_LIBRARY.map(item => item.type));
+ for (const kind of PAGE_BLOCK_KINDS) assert.equal(catalog.has(kind), true, kind);
+});
