@@ -1,8 +1,10 @@
 # Veyra
 
-**Your work, unmistakably yours.**
+**Imagine it. Build it. Own it.**
 
-Veyra is a modular portfolio and creator platform designed to grow from a premium publishing product into a broader creator ecosystem.
+**Brand philosophy:** Vision Evolved. Your Reach Amplified.
+
+Veyra is an evolving creative platform with a website studio, owned publishing workflows and creator discovery. **Veyra Studio** is the website-building product; Veyra remains the master brand. See [Brand standard](docs/BRAND_STANDARD.md) for approved naming and truthful product claims.
 
 > Powered by Timzee Corp
 
@@ -25,7 +27,7 @@ Veyra is a modular portfolio and creator platform designed to grow from a premiu
 
 ## Actual development status
 
-This is an **unreleased development product**, not a production-ready website builder. The current branch contains authentication flows, creator profiles and portfolio presentation, a homepage content editor, a multi-page drag-to-reorder editor, section bundles and a private saved-section library, owner-scoped publishing, plus private recovery from up to 30 published page versions.
+This is an **unreleased development product**, not a production-ready website builder. The master-brand tagline is **Imagine it. Build it. Own it.** The current branch contains authentication flows, creator profiles and portfolio presentation, a homepage content editor, a multi-page drag-to-reorder editor, section bundles and a private saved-section library, owner-scoped publishing, plus private recovery from up to 30 published page versions, and owner-only JSON backups of website-page drafts and snapshots (not complete account exports).
 
 Planned but **not launch-ready**: live payment reconciliation, paid custom domains, AI website generation, shared agency collaboration, end-to-end media management, full responsive drag-and-drop layout controls, and large-scale capacity evidence. Do not expose mock or gated features as working services.
 
@@ -74,7 +76,7 @@ docs/
 5. Against staging only, run the rollback-only tests `tests/db/creator-onboarding-smoke.sql`, `tests/db/page-history-smoke.sql`, `tests/db/design-revision-smoke.sql`, `tests/db/public-site-visibility-smoke.sql`, and `tests/db/saved-section-library-smoke.sql` with a trusted SQL editor. Each creates temporary fixtures inside a transaction and rolls them back.
 6. Manually verify desktop/mobile, sign-up, profile, page authoring, publishing, unpublishing, unauthorized cross-account access, redirects, accessibility and media handling before merging or deploying.
 
-See [Supabase setup](docs/NEW_SUPABASE_PROJECT_SETUP.md), [launch gates](docs/BUILDER_RELEASE_GATES.md), and [operational/acquisition standards](docs/ACQUISITION_AND_OPERATIONS_READINESS.md).
+See [Supabase setup](docs/NEW_SUPABASE_PROJECT_SETUP.md), [Netlify staging checklist](docs/NETLIFY_STAGING_CHECKLIST.md), [launch gates](docs/BUILDER_RELEASE_GATES.md), and [operational/acquisition standards](docs/ACQUISITION_AND_OPERATIONS_READINESS.md).
 
 ## Development rule
 
