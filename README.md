@@ -67,11 +67,11 @@ docs/
 
 ## Reproduce the environment
 
-1. Use **Node.js 22 or later** and run `npm ci`.
+1. Use **Node.js 22 or later**. **Current blocker:** this repository does not yet have a committed `package-lock.json`. A maintainer with npm registry access must run `npm install --package-lock-only --ignore-scripts`, review and commit the resulting lockfile. **Then** use `npm ci` for reproducible installs and test/build checks. Do not label the build verified until these commands actually pass.
 2. Set the variables documented in `.env.example`, using credentials for a **dedicated** Veyra Supabase project. Never commit secrets.
 3. Apply the ordered SQL in `supabase/migrations/` to an empty **staging** project. Apply required seed data `supabase/seed/0001_catalog.sql` and `0002_templates.sql` **after** migrations; optional `0003_blog.sql` loads sample editorial content. Skipping the seeds prevents creator onboarding and template selection.
 4. Run `npm run typecheck`, `npm run lint`, `npm run test:builder`, and `npm run build`. These checks do not require GitHub Actions or Netlify.
-5. Against staging only, run `tests/db/page-history-smoke.sql` with a trusted database SQL editor. This test creates temporary fixtures inside a transaction and rolls them all back.
+5. Against staging only, run the rollback-only tests `tests/db/creator-onboarding-smoke.sql`, `tests/db/page-history-smoke.sql`, `tests/db/design-revision-smoke.sql`, and `tests/db/public-site-visibility-smoke.sql` with a trusted SQL editor. Each creates temporary fixtures inside a transaction and rolls them back.
 6. Manually verify desktop/mobile, sign-up, profile, page authoring, publishing, unpublishing, unauthorized cross-account access, redirects, accessibility and media handling before merging or deploying.
 
 See [Supabase setup](docs/NEW_SUPABASE_PROJECT_SETUP.md), [launch gates](docs/BUILDER_RELEASE_GATES.md), and [operational/acquisition standards](docs/ACQUISITION_AND_OPERATIONS_READINESS.md).
