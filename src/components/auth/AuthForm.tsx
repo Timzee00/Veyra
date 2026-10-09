@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import { safeInternalRedirect } from "@/platform/auth/redirect";
 
 type Mode = "login" | "signup";
 
@@ -26,7 +27,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     try {
       const supabase = createSupabaseBrowserClient();
       const requestedNext = searchParams.get("next") || "/dashboard";
-      const next = requestedNext.startsWith("/") && !requestedNext.startsWith("//") && !requestedNext.includes("\\") ? requestedNext : "/dashboard";
+      const next = safeInternalRedirect(requestedNext);
       if (resetMode) {
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/auth/callback?next=/reset-password` });
         if (resetError) throw resetError;
