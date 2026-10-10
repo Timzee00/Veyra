@@ -5,7 +5,7 @@ export type PageBlockKind = typeof PAGE_BLOCK_KINDS[number];
 export type PageBlock = BuilderNode & { type: PageBlockKind };
 export type PageDocument = PageBlock[];
 
-const allowedProps = new Set(["text", "url", "alt", "question", "answer"]);
+const allowedProps = new Set(["text", "url", "alt", "question", "answer", "align", "width", "tone"]);
 
 export function pageDocumentIsValid(value: unknown): value is PageDocument {
   if (!Array.isArray(value) || value.length > 80) return false;
@@ -23,6 +23,9 @@ export function pageDocumentIsValid(value: unknown): value is PageDocument {
       if (!allowedProps.has(key) || typeof prop !== "string" || prop.length > 4000) return false;
     }
     const props = block.props as Record<string, string>;
+    if (props.align && !["left","center","right"].includes(props.align)) return false;
+    if (props.width && !["full","medium","narrow"].includes(props.width)) return false;
+    if (props.tone && !["plain","soft","accent"].includes(props.tone)) return false;
     if ((block.type === "button" || block.type === "image") && !safeSiteUrl(props.url ?? "")) return false;
     if (block.type === "image" && (props.alt ?? "").length > 220) return false;
   }
