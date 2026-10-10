@@ -45,3 +45,12 @@ test("every page-editor block exists in the shared block catalog", () => {
  const catalog = new Set(BLOCK_LIBRARY.map(item => item.type));
  for (const kind of PAGE_BLOCK_KINDS) assert.equal(catalog.has(kind), true, kind);
 });
+
+test("visual presentation presets accept only explicitly supported settings", () => {
+  const heading = createPageBlock("heading");
+  const styled = { ...heading, props: { ...heading.props, align: "center", width: "medium", tone: "soft" } };
+  assert.equal(pageDocumentIsValid([styled]), true);
+  for (const [key, value] of [["align","diagonal"],["width","200vw"],["tone","url(javascript:alert(1))"]]) {
+    assert.equal(pageDocumentIsValid([{...heading,props:{...heading.props,[key]:value}}]), false);
+  }
+});
