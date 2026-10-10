@@ -3,12 +3,14 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import CreatorImageLibrary from "@/components/assets/CreatorImageLibrary";
 
-type Creator = { id: string; handle: string; display_name: string; bio: string | null; category: string | null; location: string | null; website_url: string | null; whatsapp_number: string | null; default_inquiry_message: string | null };
+type Creator = { id: string; handle: string; display_name: string; bio: string | null; category: string | null; location: string | null; website_url: string | null; whatsapp_number: string | null; default_inquiry_message: string | null; avatar_path: string | null };
 type Site = { visibility: "draft" | "published" | "unlisted"; title: string | null; seo_description: string | null } | null;
 
 export default function ProfileEditor({ creator, site }: { creator: Creator; site: Site }) {
   const router = useRouter();
+  const [avatarPath,setAvatarPath]=useState(creator.avatar_path);
   const [name, setName] = useState(creator.display_name);
   const [bio, setBio] = useState(creator.bio ?? "");
   const [category, setCategory] = useState(creator.category ?? "");
@@ -22,6 +24,18 @@ export default function ProfileEditor({ creator, site }: { creator: Creator; sit
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  async function useAvatar(_url:string, path:string) {
+    setError(null);setNotice(null);
+    try{
+      const {error:updateError}=await createSupabaseBrowserClient().from("creator_accounts")
+        .update({avatar_path:path}).eq("id",creator.id);
+      if(updateError)throw updateError;
+      setAvatarPath(path);
+      setNotice("Profile image updated.");
+      router.refresh();
+    }catch(caught){setError(caught instanceof Error?caught.message:"Could not update profile image.");}
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -39,6 +53,7 @@ export default function ProfileEditor({ creator, site }: { creator: Creator; sit
 
   return (
     <form className="project-form profile-form" onSubmit={submit}>
+      <section className="settings-block"><p className="eyebrow">YOUR PROFILE IMAGE</p><h2>Give your brand a face.</h2><p>Upload a portrait or logo. Your public profile and link page will display it.</p><CreatorImageLibrary creatorId={creator.id} compact label="Use as profile picture" onSelect={(url,path)=>void useAvatar(url,path)}/>{avatarPath&&<p>Profile image selected.</p>}</section>
       <section className="settings-block"><p className="eyebrow">PUBLIC IDENTITY</p><h2>@{creator.handle}</h2><label>Display name<input value={name} onChange={(e)=>setName(e.target.value)} required maxLength={80}/></label><label>Bio<textarea value={bio} onChange={(e)=>setBio(e.target.value)} rows={4} maxLength={500}/></label><label>Creative field<select value={category} onChange={(e)=>setCategory(e.target.value)}><option value="">Choose your field</option>{["Design","Photography","Fashion","Art","Writing","Technology","Business","Music","Education","Other"].map(field=><option key={field} value={field}>{field}</option>)}</select></label><label>Location (optional)<input value={location} onChange={(e)=>setLocation(e.target.value)} maxLength={100} placeholder="Lagos, Nigeria" /></label><label>Website<input value={website} onChange={(e)=>setWebsite(e.target.value)} type="url" placeholder="https://example.com" /></label></section>
       <section className="settings-block"><p className="eyebrow">CONTACT</p><label>WhatsApp number<input value={whatsapp} onChange={(e)=>setWhatsapp(e.target.value)} placeholder="2348012345678" inputMode="tel" /></label><label>Default WhatsApp inquiry<input value={message} onChange={(e)=>setMessage(e.target.value)} maxLength={600}/></label></section>
       <section className="settings-block"><p className="eyebrow">SEARCH & PUBLISHING</p><label>Portfolio title<input value={siteTitle} onChange={(e)=>setSiteTitle(e.target.value)} maxLength={120}/></label><label>SEO description<textarea value={seo} onChange={(e)=>setSeo(e.target.value)} rows={3} maxLength={300}/></label><label>Visibility<select value={visibility} onChange={(e)=>setVisibility(e.target.value as typeof visibility)}><option value="draft">Draft — private</option><option value="published">Published — public</option><option value="unlisted">Unlisted — direct link only</option></select></label></section>
