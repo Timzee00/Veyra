@@ -86,7 +86,7 @@ export default function PortfolioRenderer({
 
         <div className="portfolio-nav-actions">
           {sitePages.length > 0 && <details className="portfolio-page-dropdown"><summary>Pages ▾</summary><nav aria-label="Website pages">{sitePages.map(page=><Link key={page.slug} href={`/creator/${creator.handle}/pages/${page.slug}`}>{page.title}</Link>)}</nav></details>}
-          <a className="portfolio-nav-work" href="#work">Work</a>
+          <a className="portfolio-nav-work" href="#work">Work</a><Link href={`/links/${creator.handle}`} className="portfolio-nav-work">My links</Link>
           {whatsappUrl ? (
             <a className="portfolio-contact" href={whatsappUrl} target="_blank" rel="noreferrer">Start a project ↗</a>
           ) : (
