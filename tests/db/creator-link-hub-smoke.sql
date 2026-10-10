@@ -23,6 +23,7 @@ begin
  values(creator,'Hidden link','https://example.org',1,false);
 
  execute 'set local role anon';
+ perform set_config('request.jwt.claim.sub','',true);
  select count(*) into visible from public.creator_links where creator_id=creator;
  if visible<>0 then raise exception 'Private links visible before publish'; end if;
 
