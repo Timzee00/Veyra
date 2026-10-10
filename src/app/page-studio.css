@@ -1,7 +1,7 @@
 /* Multi-page Veyra Studio: responsive three-panel workspace, accessible controls, and public rendering. */
 .vstudio-page-shell{min-height:100vh;background:#090b11;color:#f2f2f5}
 .vstudio-site-nav{height:62px;border-bottom:1px solid #ffffff1a;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(15px,3vw,36px);gap:18px}
-.vstudio-site-nav a{font-size:12px;color:#d3cbe4}.vstudio-site-brand{font-weight:800;letter-spacing:.17em}.vstudio-site-nav span{font-size:10px;color:#9b92aa}
+.vstudio-site-nav a{font-size:12px;color:#d3cbe4}.vstudio-site-brand{font-weight:800;letter-spacing:.17em}.vstudio-site-nav span{font-size:11px;color:#9b92aa}
 .vstudio{max-width:1920px;margin:0 auto;padding:clamp(18px,3vw,38px)}
 .vstudio-top{display:flex;align-items:flex-end;justify-content:space-between;gap:25px;flex-wrap:wrap;padding-bottom:27px;border-bottom:1px solid #ffffff19}
 .vstudio-top h1{font-size:clamp(35px,5vw,65px);line-height:1.05;letter-spacing:-.06em;margin:9px 0}
@@ -15,18 +15,18 @@
 .vstudio-alert{padding:14px 18px;margin:20px 0;background:#9d752c2a;border:1px solid #b08a3b70;border-radius:12px;color:#efcda2;font-size:12px}
 .vstudio-metadata{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px;margin:20px 0}
 .vstudio-metadata label,.vstudio-inspector label{display:grid;gap:8px;color:#c2bad1;font-size:12px;font-weight:650}
-.vstudio-metadata label>span{color:#a8a0bb;font-size:10px}
+.vstudio-metadata label>span{color:#a8a0bb;font-size:11px}
 .vstudio-metadata input,.vstudio-inspector input,.vstudio-inspector textarea{width:100%;min-width:0;border:1px solid #ffffff29;background:#181d2d;color:#fff;border-radius:9px;padding:12px;font:inherit;font-size:13px;outline:none}
 .vstudio-workspace{display:grid;grid-template-columns:minmax(180px,220px) minmax(0,1fr) minmax(190px,250px);gap:14px;align-items:start}
 .vstudio-library,.vstudio-inspector{padding:18px;border:1px solid #ffffff1b;background:#111622;border-radius:16px;min-width:0;display:grid;gap:12px}
 .vstudio-library h2,.vstudio-inspector h2{font-size:17px;letter-spacing:-.03em;margin:7px 0 5px}
 .vstudio-element-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .vstudio-element-grid button{font-size:11px;padding:10px 7px;text-align:left}
-.vstudio-kit{display:grid;gap:4px;text-align:left}.vstudio-kit strong{font-size:12px}.vstudio-kit small{color:#beb5d0;font-size:10px;line-height:1.4}
+.vstudio-kit{display:grid;gap:4px;text-align:left}.vstudio-kit strong{font-size:12px}.vstudio-kit small{color:#beb5d0;font-size:11px;line-height:1.4}
 .vstudio-library>p,.vstudio-inspector>p{color:#a9a0b9;font-size:11px;line-height:1.65}
 .vstudio-canvas{background:#111521;border:1px solid #ffffff1f;padding:17px;border-radius:16px;min-width:0}
 .vstudio-canvas-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
-.vstudio-canvas-toolbar>span{font-size:10px;letter-spacing:.13em;color:#c8b7ea;font-weight:750}
+.vstudio-canvas-toolbar>span{font-size:11px;letter-spacing:.13em;color:#c8b7ea;font-weight:750}
 .vstudio-canvas-toolbar>div{display:flex;gap:5px}
 .vstudio-canvas-toolbar button{padding:8px 11px}
 .vstudio-canvas-toolbar button[aria-pressed=true]{background:#d6c4ff;color:#20152f}
@@ -34,9 +34,9 @@
 .vstudio-preview-paper{width:100%;max-width:880px;margin:auto;min-height:420px;background:#fbfaf6;color:#1d1b22;box-shadow:0 20px 55px #0007;transition:max-width .2s}
 .vstudio-viewport.viewport-tablet .vstudio-preview-paper{max-width:600px}.vstudio-viewport.viewport-mobile .vstudio-preview-paper{max-width:350px}
 .vstudio-preview-nav{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:19px 25px;border-bottom:1px solid #00000020;font-size:11px}
-.vstudio-preview-nav strong{font-size:13px;overflow-wrap:anywhere}.vstudio-preview-nav span{font-size:10px;color:#696476}
-.vstudio-preview-paper footer{font-size:10px;color:#6b637b;padding:20px 25px;border-top:1px solid #00000019}
-.vstudio-hint{color:#b3abc4;font-size:10px;line-height:1.65;margin:15px 0}
+.vstudio-preview-nav strong{font-size:13px;overflow-wrap:anywhere}.vstudio-preview-nav span{font-size:11px;color:#696476}
+.vstudio-preview-paper footer{font-size:11px;color:#6b637b;padding:20px 25px;border-top:1px solid #00000019}
+.vstudio-hint{color:#b3abc4;font-size:11px;line-height:1.65;margin:15px 0}
 .vstudio-start{padding:60px 25px;color:#373041}.vstudio-start h2{font-size:30px;letter-spacing:-.04em}.vstudio-start p{color:#5d566a;line-height:1.6}
 .vstudio-layer-heading{margin:35px 0 10px}.vstudio-layer-heading h2{font-size:19px;margin:0 0 8px}.vstudio-layer-heading p{font-size:11px;color:#aca5bc;line-height:1.6}
 .vstudio-layers{list-style:none;display:grid;gap:7px;padding:0;margin:16px 0}
@@ -105,7 +105,7 @@
 .vstudio-library-items{list-style:none;margin:0;padding:0;display:grid;gap:9px;min-width:0}
 .vstudio-library-items li{min-width:0;background:#1c2130;border:1px solid #ffffff21;border-radius:11px;display:grid;gap:5px;padding:12px}
 .vstudio-library-items strong{font-size:12px;color:#fff;overflow-wrap:anywhere}
-.vstudio-library-items small{font-size:10px;color:#b9afc9}
+.vstudio-library-items small{font-size:11px;color:#b9afc9}
 .vstudio-saved-library [role="alert"]{overflow-wrap:anywhere}
 @media(prefers-reduced-motion:reduce){.vstudio-saved-library *{transition:none!important}}
 
