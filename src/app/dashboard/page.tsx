@@ -37,7 +37,7 @@ export default async function DashboardPage() {
         <div className="dashboard-context"><span>CREATOR SPACE</span><strong>{creator.display_name}</strong><small>@{creator.handle}</small></div>
         <nav className="dashboard-nav">
           <Link className="active" href="/dashboard">Overview</Link>
-          <Link href="/dashboard/homepage">Homepage</Link><Link href="/dashboard/pages">Website pages</Link><Link href="/dashboard/projects">Projects</Link>
+          <Link href="/dashboard/homepage">Homepage</Link><Link href="/dashboard/pages">Website pages</Link><Link href="/dashboard/assets">Images</Link><Link href="/dashboard/links">My links</Link><Link href="/dashboard/projects">Projects</Link>
           <Link href="/dashboard/profile">Profile</Link>
           <Link href="/dashboard/appearance">Appearance</Link>
           <Link href="/dashboard/analytics">Analytics</Link>
