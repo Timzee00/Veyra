@@ -31,6 +31,7 @@ begin
  perform set_config('request.jwt.claim.sub',owner_id::text,true);
  update public.creator_sites set visibility='published' where creator_id=creator;
  execute 'set local role anon';
+ perform set_config('request.jwt.claim.sub','',true);
  select count(*) into visible from public.creator_links where creator_id=creator;
  if visible<>1 then raise exception 'Expected one public link, got %',visible;end if;
 
