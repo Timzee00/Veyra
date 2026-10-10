@@ -3,6 +3,7 @@
  * Set NEXT_PUBLIC_SITE_URL explicitly in production; hosting URLs are fallbacks.
  */
 export type SiteEnvironment = {
+  [variable: string]: string | undefined;
   NEXT_PUBLIC_SITE_URL?: string;
   NEXT_PUBLIC_APP_URL?: string;
   URL?: string;
