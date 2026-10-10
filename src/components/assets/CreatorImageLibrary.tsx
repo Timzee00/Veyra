@@ -15,6 +15,7 @@ type ImageAsset = {
 
 const mimeTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const IMAGE_EXTENSIONS: Record<string,string> = { "image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/gif":"gif" };
 const MAX_ITEMS_PER_PICK = 5;
 
 export default function CreatorImageLibrary({
@@ -77,7 +78,7 @@ export default function CreatorImageLibrary({
         if (!mimeTypes.has(file.type)) throw new Error(`${file.name}: upload a JPG, PNG, WebP or GIF.`);
         if (!file.size || file.size > MAX_FILE_SIZE)
           throw new Error(`${file.name}: images must be smaller than 5 MB.`);
-        const extension = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[file.type];
+        const extension = IMAGE_EXTENSIONS[file.type];
         const path = `${creatorId}/${crypto.randomUUID()}.${extension}`;
         const { error: fileError } = await client.storage.from("veyra-images")
           .upload(path, file, { contentType: file.type, cacheControl: "3600", upsert: false });
