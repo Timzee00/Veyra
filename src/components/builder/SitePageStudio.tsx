@@ -71,6 +71,14 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     edit([...blocks, block]);
     setSelectedId(block.id);
   }
+  function insertAt(kind: PageBlockKind, index: number) {
+    if (busy || blocks.length >= 80) return;
+    const block = createPageBlock(kind);
+    const next = [...blocks];
+    next.splice(Math.max(0,Math.min(index,next.length)),0,block);
+    edit(next);
+    setSelectedId(block.id);
+  }
   function addKit(kinds: readonly PageBlockKind[]) {
     if (count + kinds.length > 80) return;
     const next = makeSectionKit(kinds);
@@ -222,16 +230,16 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
     </div>
     <div className="vstudio-workspace">
       <aside className="vstudio-library"><h2>Elements</h2><div className="vstudio-element-grid">
-        {PAGE_BLOCK_KINDS.map(kind=><button type="button" key={kind} onClick={()=>add(kind)} disabled={count>=80||busy}>+ {kind === "faq" ? "FAQ" : kind[0].toUpperCase()+kind.slice(1)}</button>)}
+        {PAGE_BLOCK_KINDS.map(kind=><button type="button" key={kind} draggable={count<80&&!busy} onDragStart={event=>{event.dataTransfer.setData("application/x-veyra-block",kind);event.dataTransfer.effectAllowed="copy";}} title="Drag onto the page, or tap to add" onClick={()=>add(kind)} disabled={count>=80||busy}><span aria-hidden="true">⠿</span> {kind === "faq" ? "FAQ" : kind[0].toUpperCase()+kind.slice(1)}</button>)}
       </div><h2>Ready-made sections</h2>{SECTION_KITS.map(kit=><button type="button" className="vstudio-kit" key={kit.title} onClick={()=>addKit(kit.blocks)} disabled={count+kit.blocks.length>80||busy}><strong>{kit.title}</strong><small>{kit.description}</small></button>)}<p>Start with safe, responsive sections. No coding or paid AI required.</p><SavedSectionLibrary creatorId={page.creator_id} blocks={blocks} selectedId={selectedId} busy={busy} onInsert={insertSavedSections} /><h2>Reusable sections</h2><p>Copy sections from this page and reuse them in another page. Imported elements receive new IDs and are private until published.</p><button type="button" className="vstudio-kit" disabled={!blocks.length||busy} onClick={()=>void copySections()}>Copy all page sections</button><button type="button" className="vstudio-kit" onClick={()=>setShowBundles(v=>!v)}>{showBundles?"Close import":"Import section bundle"}</button>{showBundles&&<div className="vstudio-bundle-import"><label>Paste Veyra section bundle<textarea rows={5} value={bundleText} onChange={e=>setBundleText(e.target.value)} maxLength={400000} placeholder="Paste copied JSON here" /></label><button type="button" disabled={!bundleText.trim()||busy} onClick={appendSections}>Add sections to draft</button></div>}</aside>
       <section className="vstudio-canvas">
         <div className="vstudio-canvas-toolbar"><span>PAGE PREVIEW · {count} ELEMENTS</span><div role="group" aria-label="Preview width">{(["desktop","tablet","mobile"] as const).map(size=><button type="button" key={size} aria-pressed={device===size} onClick={()=>setDevice(size)}>{size}</button>)}</div></div>
         <div className={`vstudio-viewport viewport-${device}`}><div className="vstudio-preview-paper"><div className="vstudio-preview-nav"><strong>{creatorHandle}</strong><span>Home · {title}</span></div>
-          <DraggablePageCanvas blocks={blocks} selectedId={selectedId} siteBasePath={`/creator/${creatorHandle}`} busy={busy} onSelect={setSelectedId} onMove={reorder}/>
+          <DraggablePageCanvas blocks={blocks} selectedId={selectedId} siteBasePath={`/creator/${creatorHandle}`} busy={busy} onSelect={setSelectedId} onMove={reorder} onInsert={insertAt}/>
           {!blocks.length && <div className="vstudio-start"><h2>Your canvas is ready.</h2><p>Choose an element or a section on the left. The page will update instantly.</p></div>}
           <footer>Powered by Timzee Corp</footer>
         </div></div>
-        <p className="vstudio-hint">Drag the handle on any element to reposition it directly on the page. Tap Edit for its settings; public links only become active after publishing.</p>
+        <p className="vstudio-hint">Drag an element from the left panel onto the page (desktop), or tap to add. Drag the handle on an existing block to reorder it with mouse or touch.</p>
         <div className="vstudio-layer-heading"><h2>Layers & order</h2><p>Drag elements, or use the arrow buttons to move them on mobile or with a keyboard.</p></div>
         <ol className="vstudio-layers">{blocks.map((block,index)=><li key={block.id} draggable={!busy} onDragStart={e=>{setDragging(index);e.dataTransfer.effectAllowed="move";}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(dragging!==null)reorder(dragging,index);setDragging(null);}} onDragEnd={()=>setDragging(null)} className={selectedId===block.id?"selected":""}>
           <button type="button" className="vstudio-layer-select" aria-pressed={selectedId===block.id} onClick={()=>setSelectedId(block.id)}><span aria-hidden="true">⠿</span> {index+1}. {block.type}</button>
