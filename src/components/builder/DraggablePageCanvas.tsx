@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import PageBlocks from "@/components/builder/PageBlocks";
-import type { PageDocument } from "@/platform/builder/page-model";
+import { PAGE_BLOCK_KINDS } from "@/platform/builder/page-model";
+import type { PageDocument, PageBlockKind } from "@/platform/builder/page-model";
 
 type DragSession = { fromId: string; targetId: string; active: boolean; startX: number; startY: number };
 type Props = {
@@ -12,9 +13,10 @@ type Props = {
  busy: boolean;
  onSelect: (id: string) => void;
  onMove: (from: number, to: number) => void;
+ onInsert: (kind: PageBlockKind, atIndex: number) => void;
 };
 
-export default function DraggablePageCanvas({ blocks, selectedId, siteBasePath, busy, onSelect, onMove }: Props) {
+export default function DraggablePageCanvas({ blocks, selectedId, siteBasePath, busy, onSelect, onMove, onInsert }: Props) {
  const drag = useRef<DragSession | null>(null);
  const [draggedId, setDraggedId] = useState<string | null>(null);
  const [overId, setOverId] = useState<string | null>(null);
@@ -51,11 +53,29 @@ export default function DraggablePageCanvas({ blocks, selectedId, siteBasePath, 
   drag.current=null;setDraggedId(null);setOverId(null);
   if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
  }
- return <div className="vstudio-drag-canvas" aria-label="Direct manipulation website canvas">
+ function allowPaletteDrop(event: React.DragEvent<HTMLElement>) {
+   if (!busy && event.dataTransfer.types.includes("application/x-veyra-block")) {
+     event.preventDefault();
+     event.dataTransfer.dropEffect = "copy";
+   }
+ }
+ function insertPaletteDrop(event: React.DragEvent<HTMLElement>, index: number) {
+   if (busy) return;
+   const kind = event.dataTransfer.getData("application/x-veyra-block");
+   if (!PAGE_BLOCK_KINDS.includes(kind as PageBlockKind)) return;
+   event.preventDefault();
+   event.stopPropagation();
+   onInsert(kind as PageBlockKind, index);
+ }
+ return <div className="vstudio-drag-canvas" aria-label="Direct manipulation website canvas"
+    onDragOver={allowPaletteDrop}
+    onDrop={event=>insertPaletteDrop(event,blocks.length)}>
    {blocks.map((block,index)=><div key={block.id}
      data-veyra-canvas-block={block.id}
      className={["vstudio-editable-block",block.id===selectedId?"is-selected":"",block.id===draggedId?"is-dragging":"",block.id===overId && draggedId!==block.id?"is-drop-target":""].filter(Boolean).join(" ")}
      onClick={()=>{if(!drag.current&&!busy)onSelect(block.id);}}
+     onDragOver={allowPaletteDrop}
+     onDrop={event=>insertPaletteDrop(event,index)}
    >
      <div className="vstudio-editable-controls">
       <button type="button" className="vstudio-drag-handle"
