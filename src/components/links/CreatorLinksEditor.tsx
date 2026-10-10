@@ -107,8 +107,18 @@ export default function CreatorLinksEditor({
       <button type="button" disabled={busy||index===0} aria-label={`Move ${item.label} up`} onClick={()=>void shift(index,-1)}>↑</button>
       <button type="button" disabled={busy||index===links.length-1} aria-label={`Move ${item.label} down`} onClick={()=>void shift(index,1)}>↓</button>
       <button type="button" disabled={busy} onClick={()=>void update(item,{is_visible:!item.is_visible})}>{item.is_visible?"Hide":"Show"}</button>
-      <button type="button" disabled={busy} onClick={()=>{const next=window.prompt("Button title",item.label);if(next!==null)void update(item,{label:next.trim()});}}>Rename</button>
-      <button type="button" disabled={busy} onClick={()=>{const next=window.prompt("HTTPS destination",item.url);if(next!==null)void update(item,{url:next.trim()});}}>Edit URL</button>
+      <details className="veyra-link-inline-editor"><summary>Edit link</summary>
+        <form onSubmit={event=>{event.preventDefault();
+          const values=new FormData(event.currentTarget);
+          const newLabel=String(values.get("label")??"").trim();
+          const newUrl=String(values.get("url")??"").trim();
+          void update(item,{label:newLabel,url:newUrl});
+        }}>
+          <label>Link title<input name="label" maxLength={75} defaultValue={item.label} required disabled={busy}/></label>
+          <label>HTTPS destination<input name="url" type="url" maxLength={1500} defaultValue={item.url} required disabled={busy}/></label>
+          <button type="submit" disabled={busy}>Save changes</button>
+        </form>
+      </details>
       <button type="button" disabled={busy} onClick={()=>void remove(item)}>Delete</button>
     </div>
    </li>)}</ol>
