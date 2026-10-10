@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { VEYRA } from "@/platform/brand/identity";
 
-type Creator = { id: string; handle: string; display_name: string; bio: string | null; category: string | null; location: string | null; featured: boolean; avatar_path: string | null };
+type Creator = { id: string; handle: string; display_name: string; bio: string | null; category: string | null; location: string | null; featured: boolean; avatar_path: string | null; avatarUrl: string | null };
 type Project = { id: string; slug: string; title: string; summary: string | null; published_at: string | null; creator: { handle: string; display_name: string } | null };
 type Post = { id: string; slug: string; title: string; excerpt: string | null; post_type: string; published_at: string | null; creator: { handle: string; display_name: string } | null };
 
@@ -15,7 +15,7 @@ async function getDiscoveryData() {
       supabase.from("posts").select("id, slug, title, excerpt, post_type, published_at, creator_accounts!inner(handle, display_name)").eq("published", true).order("published_at", { ascending: false }).limit(6),
     ]);
     return {
-      creators: (creators ?? []) as Creator[],
+      creators: (creators ?? []).map(item => ({...item, avatarUrl: item.avatar_path?.startsWith(`${item.id}/`) ? supabase.storage.from("veyra-images").getPublicUrl(item.avatar_path).data.publicUrl : null })) as Creator[],
       projects: (projects ?? []).map((item) => ({ ...item, creator: Array.isArray(item.creator_accounts) ? item.creator_accounts[0] : item.creator_accounts })) as Project[],
       posts: (posts ?? []).map((item) => ({ ...item, creator: Array.isArray(item.creator_accounts) ? item.creator_accounts[0] : item.creator_accounts })) as Post[],
     };
@@ -60,7 +60,7 @@ export default async function Home() {
 
       <section className="discover-section" aria-labelledby="creators-title">
         <div className="discover-heading"><div><p className="eyebrow">01 / PEOPLE</p><h2 id="creators-title">Creators to know.</h2></div><Link href="/explore?type=creators">View all creators ↗</Link></div>
-        <div className="creator-discover-grid">{creators.map((creator) => <Link className="creator-discover-card" href={`/u/${creator.handle}`} key={creator.id}><div className="creator-avatar">{creator.avatar_path ? <span aria-hidden="true">●</span> : <span>{creator.display_name.slice(0, 1).toUpperCase()}</span>}</div><div><h3>{creator.display_name}</h3><p>{creator.category || "Independent creator"}{creator.location ? ` · ${creator.location}` : ""}</p><small>@{creator.handle}</small></div>{creator.featured && <strong>Editor’s pick</strong>}</Link>)}{creators.length === 0 && <div className="discover-empty">Creator discovery will populate as creators publish their Veyra sites.</div>}</div>
+        <div className="creator-discover-grid">{creators.map((creator) => <Link className="creator-discover-card" href={`/u/${creator.handle}`} key={creator.id}><div className="creator-avatar">{creator.avatarUrl ? <img src={creator.avatarUrl} alt="" className="veyra-discover-avatar-image" loading="lazy"/> : <span>{creator.display_name.slice(0, 1).toUpperCase()}</span>}</div><div><h3>{creator.display_name}</h3><p>{creator.category || "Independent creator"}{creator.location ? ` · ${creator.location}` : ""}</p><small>@{creator.handle}</small></div>{creator.featured && <strong>Editor’s pick</strong>}</Link>)}{creators.length === 0 && <div className="discover-empty">Creator discovery will populate as creators publish their Veyra sites.</div>}</div>
       </section>
 
       <section className="discover-section" aria-labelledby="projects-title">
