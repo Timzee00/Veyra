@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { pageSlugIsValid } from "@/platform/builder/page-slug";
-import PageBlocks from "@/components/builder/PageBlocks";
+import DraggablePageCanvas from "@/components/builder/DraggablePageCanvas";
+import CreatorImageLibrary from "@/components/assets/CreatorImageLibrary";
 import PageVersionHistory from "@/components/builder/PageVersionHistory";
 import SavedSectionLibrary from "@/components/builder/SavedSectionLibrary";
 import { exportSectionBundle, importSectionBundle } from "@/platform/builder/section-bundle";
@@ -206,7 +207,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
 
   return <div className="vstudio">
     <div className="vstudio-top">
-      <div><p className="eyebrow">VEYRA STUDIO / PAGE EDITOR</p><h1>{title || "Untitled page"}</h1><p className="vstudio-subtitle">Add sections, edit details and approve the exact version that goes live.</p></div>
+      <div><p className="eyebrow">VEYRA STUDIO / PAGE EDITOR</p><h1>{title || "Untitled page"}</h1><p className="vstudio-subtitle">Drag directly on the canvas with your mouse or finger. Select any block to edit it and publish when ready.</p></div>
       <div className="vstudio-commands"><span role="status">{busy?"Working…":dirty?"Unsaved changes":"Draft saved"}</span>
         <button type="button" onClick={undo} disabled={!past.length||busy}>Undo</button>
         <button type="button" onClick={redo} disabled={!future.length||busy}>Redo</button>
@@ -226,11 +227,11 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
       <section className="vstudio-canvas">
         <div className="vstudio-canvas-toolbar"><span>PAGE PREVIEW · {count} ELEMENTS</span><div role="group" aria-label="Preview width">{(["desktop","tablet","mobile"] as const).map(size=><button type="button" key={size} aria-pressed={device===size} onClick={()=>setDevice(size)}>{size}</button>)}</div></div>
         <div className={`vstudio-viewport viewport-${device}`}><div className="vstudio-preview-paper"><div className="vstudio-preview-nav"><strong>{creatorHandle}</strong><span>Home · {title}</span></div>
-          <PageBlocks blocks={blocks} siteBasePath={`/creator/${creatorHandle}`}/>
+          <DraggablePageCanvas blocks={blocks} selectedId={selectedId} siteBasePath={`/creator/${creatorHandle}`} busy={busy} onSelect={setSelectedId} onMove={reorder}/>
           {!blocks.length && <div className="vstudio-start"><h2>Your canvas is ready.</h2><p>Choose an element or a section on the left. The page will update instantly.</p></div>}
           <footer>Powered by Timzee Corp</footer>
         </div></div>
-        <p className="vstudio-hint">This preview uses the same content renderer as the public page. Website-wide template styling may differ.</p>
+        <p className="vstudio-hint">Drag the handle on any element to reposition it directly on the page. Tap Edit for its settings; public links only become active after publishing.</p>
         <div className="vstudio-layer-heading"><h2>Layers & order</h2><p>Drag elements, or use the arrow buttons to move them on mobile or with a keyboard.</p></div>
         <ol className="vstudio-layers">{blocks.map((block,index)=><li key={block.id} draggable={!busy} onDragStart={e=>{setDragging(index);e.dataTransfer.effectAllowed="move";}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(dragging!==null)reorder(dragging,index);setDragging(null);}} onDragEnd={()=>setDragging(null)} className={selectedId===block.id?"selected":""}>
           <button type="button" className="vstudio-layer-select" aria-pressed={selectedId===block.id} onClick={()=>setSelectedId(block.id)}><span aria-hidden="true">⠿</span> {index+1}. {block.type}</button>
@@ -243,7 +244,7 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
       <aside className="vstudio-inspector"><h2>Inspector</h2>{selected?<><p className="vstudio-selection">{selected.type} block selected</p>
         {selected.type!=="spacer"&&selected.type!=="divider"&&selected.type!=="faq"&&selected.type!=="image"&&<label>Text<textarea rows={4} value={String(selected.props.text??"")} maxLength={4000} onChange={e=>updateProp("text",e.target.value)} /></label>}
         {(selected.type==="button"||selected.type==="image")&&<label>{selected.type==="image"?"Image address (HTTPS)":"Destination URL"}<input value={String(selected.props.url??"")} maxLength={4000} onChange={e=>updateProp("url",e.target.value)}/></label>}
-        {selected.type==="image"&&<label>Image description for accessibility<input value={String(selected.props.alt??"")} maxLength={220} onChange={e=>updateProp("alt",e.target.value)}/></label>}
+        {selected.type==="image"&&<label>Image description for accessibility<input value={String(selected.props.alt??"")} maxLength={220} onChange={e=>updateProp("alt",e.target.value)}/></label>}{selected.type==="image"&&<CreatorImageLibrary creatorId={page.creator_id} compact label="Use in this image block" onSelect={(url,_path,alt)=>{edit(blocks.map(item=>item.id===selected.id?{...item,props:{...item.props,url,alt:item.props.alt||alt}}:item));setMessage("Image added. Save your draft to keep it.");}}/>}
         {selected.type==="faq"&&<><label>Question<input value={String(selected.props.question??"")} onChange={e=>updateProp("question",e.target.value)}/></label><label>Answer<textarea rows={4} value={String(selected.props.answer??"")} onChange={e=>updateProp("answer",e.target.value)}/></label></>}
         {(selected.type==="spacer"||selected.type==="divider")&&<p>This element adds spacing or separates sections without needing text.</p>}
         </>:<p>Select an element from Layers to edit its content.</p>}
