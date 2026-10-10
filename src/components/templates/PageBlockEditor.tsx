@@ -24,7 +24,10 @@ export default function PageBlockEditor({creatorId,initialBlocks,initialRevision
  function undo(){if(!history.length)return;setFuture(f=>[blocks,...f]);setBlocks(history.at(-1)!);setHistory(h=>h.slice(0,-1));}
  function redo(){if(!future.length)return;setHistory(h=>[...h,blocks]);setBlocks(future[0]);setFuture(f=>f.slice(1));}
  function addPreset(preset:typeof SECTION_PRESETS[number]){
-  const next=preset.elements.map(([kind,text])=>({...createBlock(kind as Kind),props:kind==="button"?{text,url:"/"}:{text}}));
+  const next: BuilderNode[]=preset.elements.map(([kind,text]): BuilderNode=>{
+   const props: BuilderNode["props"]=kind==="button"?{text,url:"/"}:{text};
+   return {...createBlock(kind),props};
+  });
   if(blocks.length+next.length>40){setStatus("Your page has reached the 40-block limit.");return;}
   change([...blocks,...next]);
  }
