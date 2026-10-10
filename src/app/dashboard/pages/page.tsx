@@ -25,7 +25,7 @@ export default async function WebsitePages() {
     <aside className="dashboard-sidebar">
       <Link className="dashboard-brand" href="/">V<span>V</span> VEYRA</Link>
       <div className="dashboard-context"><span>YOUR WEBSITE</span><strong>{creator.display_name}</strong><small>@{creator.handle}</small></div>
-      <nav className="dashboard-nav"><Link href="/dashboard">Overview</Link><Link className="active" href="/dashboard/pages">Pages</Link><Link href="/dashboard/projects">Projects</Link><Link href="/dashboard/profile">Profile</Link><Link href="/dashboard/appearance">Appearance</Link><Link href="/dashboard/settings">Settings</Link></nav>
+      <nav className="dashboard-nav"><Link href="/dashboard">Overview</Link><Link className="active" href="/dashboard/pages">Pages</Link><Link href="/dashboard/projects">Projects</Link><Link href="/dashboard/assets">Images</Link><Link href="/dashboard/links">My links</Link><Link href="/dashboard/profile">Profile</Link><Link href="/dashboard/appearance">Appearance</Link><Link href="/dashboard/settings">Settings</Link></nav>
       <Link className="sidebar-public" href="/explore">Discover Veyra →</Link>
     </aside>
     <section className="dashboard-main narrow-main">
