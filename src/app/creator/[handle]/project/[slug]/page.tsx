@@ -47,6 +47,8 @@ export default async function PublicProjectPage({ params }: { params: Promise<{ 
     : { data: [] as Array<{ path: string; signedUrl: string }> };
   const signedByPath = new Map((signed ?? []).map((item) => [item.path, item.signedUrl]));
 
+  const projectBody: string = typeof project.body === "string" ? project.body.trim() : "";
+
   const whatsapp = creator.whatsapp_number
     ? `https://wa.me/${creator.whatsapp_number.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hi, I saw your "${project.title}" project on Veyra and would like to discuss a similar project.`)}`
     : null;
@@ -82,8 +84,8 @@ export default async function PublicProjectPage({ params }: { params: Promise<{ 
         )}
 
         <div className="public-project-body">
-          {project.body
-            ? project.body.split(/\n{2,}/).map((paragraph) => <p key={paragraph}>{paragraph}</p>)
+          {projectBody
+            ? projectBody.split(/\n{2,}/).map((paragraph: string, index: number) => <p key={index}>{paragraph}</p>)
             : <p>This creator has not added the full project story yet.</p>}
         </div>
 
