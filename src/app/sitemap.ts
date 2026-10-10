@@ -1,12 +1,17 @@
 import type { MetadataRoute } from "next";
 import { blogPosts } from "@/content/blog";
+import { resolveSiteOrigin, shouldAvoidIndexing } from "@/platform/seo/site-config";
 
-const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+const baseUrl = resolveSiteOrigin(process.env);
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  if (shouldAvoidIndexing(process.env)) return [];
   const routes: MetadataRoute.Sitemap = [
     { url: baseUrl, changeFrequency: "weekly", priority: 1 },
     { url: `${baseUrl}/blog`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/studio`, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${baseUrl}/for-creators`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${baseUrl}/explore`, changeFrequency: "daily", priority: 0.8 },
     { url: `${baseUrl}/privacy`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/terms`, changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/cookies`, changeFrequency: "yearly", priority: 0.2 },

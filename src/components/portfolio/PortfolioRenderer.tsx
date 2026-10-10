@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { validateBuilderTree } from "@/platform/builder/block-catalog";
 import { getRendererSections } from "@/platform/templates/renderer";
 import type { TemplateDefinition } from "@/platform/templates/types";
 
@@ -25,6 +26,8 @@ type Site = {
   seo_description: string | null;
   template_id: string;
   template_version_id?: string | null;
+  design_published?: Record<string, unknown> | null;
+  builder_published?: unknown;
 };
 
 function buildWhatsAppUrl(creator: Creator) {
@@ -48,20 +51,29 @@ export default function PortfolioRenderer({
   site,
   projects,
   definition,
+  sitePages = [],
 }: {
   creator: Creator;
   site: Site;
   projects: Project[];
   definition: TemplateDefinition;
+  sitePages?: Array<{ slug: string; title: string }>;
 }) {
   const sections = getRendererSections(definition);
+  const publishedBlocks = validateBuilderTree(site.builder_published) ? site.builder_published.filter(block => ["heading","paragraph","button","divider"].includes(block.type)) : [];
+  const design = site.design_published ?? {};
+  const accent = typeof design.accent === "string" && /^#[0-9a-fA-F]{6}$/.test(design.accent) ? design.accent : null;
+  const font = ["sans", "serif", "mono"].includes(String(design.font)) ? String(design.font) : "default";
+  const radius = ["sharp", "soft", "rounded"].includes(String(design.radius)) ? String(design.radius) : "default";
+  const motion = ["none", "subtle", "smooth"].includes(String(design.motion)) ? String(design.motion) : "default";
+  const alignment = design.heroAlignment === "center" ? "center" : "left";
   const whatsappUrl = buildWhatsAppUrl(creator);
   const featured = projects[0];
   const initials = creatorInitials(creator.display_name);
   const pageTitle = site.title?.trim() || creator.display_name;
 
   return (
-    <main className={`portfolio-shell template-${site.template_id}`}>
+    <main className={`portfolio-shell template-${site.template_id} custom-font-${font} custom-radius-${radius} custom-motion-${motion} custom-hero-${alignment}`} style={accent ? { "--portfolio-accent": accent } as React.CSSProperties : undefined}>
       <header className="portfolio-nav">
         <Link className="creator-brand" href="#top" aria-label={`${creator.display_name} home`}>
           <span className="creator-brand-mark">{initials}</span>
@@ -73,7 +85,8 @@ export default function PortfolioRenderer({
         </Link>
 
         <div className="portfolio-nav-actions">
-          <a className="portfolio-nav-work" href="#work">Work</a>
+          {sitePages.length > 0 && <details className="portfolio-page-dropdown"><summary>Pages ▾</summary><nav aria-label="Website pages">{sitePages.map(page=><Link key={page.slug} href={`/creator/${creator.handle}/pages/${page.slug}`}>{page.title}</Link>)}</nav></details>}
+          <a className="portfolio-nav-work" href="#work">Work</a><Link href={`/links/${creator.handle}`} className="portfolio-nav-work">My links</Link>
           {whatsappUrl ? (
             <a className="portfolio-contact" href={whatsappUrl} target="_blank" rel="noreferrer">Start a project ↗</a>
           ) : (
@@ -133,11 +146,8 @@ export default function PortfolioRenderer({
               </section>
             );
           case "services":
-            return (
-              <section className="portfolio-services" key={key}>
-                <p className="eyebrow">SERVICES</p><div className="service-lines"><span>Brand identity</span><span>Digital design</span><span>Motion & visual systems</span><span>Creative direction</span></div>
-              </section>
-            );
+            // Services must never be invented for a creator. Render only after editable creator services exist.
+            return null;
           case "contact":
             return (
               <section id="contact" className={`portfolio-contact-section contact-${section.variant ?? "simple"}`} key={key}>
@@ -150,6 +160,15 @@ export default function PortfolioRenderer({
         }
       })}
 
+      {publishedBlocks.length > 0 && <section className="veyra-published-blocks" aria-label="Additional website content">{publishedBlocks.map(block => {
+        const content = typeof block.props.text === "string" ? block.props.text : "";
+        const url = typeof block.props.url === "string" && (/^https:\/\//.test(block.props.url) || /^\/(?!\/)/.test(block.props.url)) ? block.props.url : null;
+        if(block.type === "heading") return <h2 key={block.id}>{content}</h2>;
+        if(block.type === "paragraph") return <p key={block.id}>{content}</p>;
+        if(block.type === "button") return url ? <a key={block.id} href={url} rel={url.startsWith("https://")?"noopener noreferrer":undefined}>{content || "Explore"} ↗</a> : null;
+        if(block.type === "divider") return <hr key={block.id}/>;
+        return null;
+      })}</section>}
       <footer className="public-creator-footer">
         <span>© {new Date().getFullYear()} {creator.display_name}</span>
         <Link href="/">Discover creators on Veyra</Link>

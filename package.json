@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:builder": "node --experimental-strip-types --test tests/*.test.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@supabase/ssr": "^0.7.0",
@@ -23,5 +25,8 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "^16.3.5",
     "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=22.16.0"
   }
 }

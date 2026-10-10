@@ -1,0 +1,19 @@
+.veyra-links-public{min-height:100vh;background:radial-gradient(ellipse at 50% 8%,#3b265e,#0a0910 60%);color:#faf6ff;padding:40px 16px 20px;display:flex;align-items:flex-start;justify-content:center}
+.veyra-links-card{width:min(100%,600px);min-width:0;text-align:center;margin:auto}
+.veyra-links-identity{display:grid;justify-items:center;gap:10px;margin:18px 0 30px}
+.veyra-links-avatar,.veyra-links-avatar-placeholder{width:112px;height:112px;border-radius:32px;border:3px solid #d5bef8;object-fit:cover;box-shadow:0 12px 30px #0007}
+.veyra-links-avatar-placeholder{display:grid;place-items:center;background:#493364;font-size:48px;font-weight:800}
+.veyra-links-identity h1{margin:7px 0 0;font-size:clamp(30px,7vw,45px);line-height:1.1;letter-spacing:-.055em}
+.veyra-links-handle{font-size:13px;color:#d0bcec;margin:0}
+.veyra-links-bio{max-width:500px;margin:5px auto;font-size:14px;line-height:1.65;color:#e1d7ee;overflow-wrap:anywhere}
+.veyra-links-list{display:grid;gap:13px}
+.veyra-links-list a{display:flex;align-items:center;justify-content:center;position:relative;min-height:66px;padding:16px 48px;gap:18px;border:1px solid #ffffff43;background:#ffffff13;border-radius:17px;font-weight:700;font-size:16px;line-height:1.4;overflow-wrap:anywhere;transition:background .15s,transform .15s}
+.veyra-links-list a span:last-child{position:absolute;right:21px}
+.veyra-links-list a:hover{background:#cab1ff2b;transform:translateY(-2px)}
+.veyra-links-list a:focus-visible,.veyra-links-profile a:focus-visible{outline:3px solid #e9ddff;outline-offset:4px}
+.veyra-links-empty{color:#c6b9d8;padding:35px 0;font-size:14px}
+.veyra-links-profile{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:34px 0}
+.veyra-links-profile a{color:#e1cfff;font-size:13px;text-decoration:underline;text-underline-offset:4px}
+.veyra-links-card footer{display:flex;justify-content:center;gap:14px;align-items:center;margin:30px 0 0;border-top:1px solid #ffffff2d;padding:23px 0;color:#bcb0cd;font-size:11px}
+.veyra-links-card footer a{font-weight:800;letter-spacing:.19em;color:#fff}
+@media(prefers-reduced-motion:reduce){.veyra-links-list a{transition:none}}

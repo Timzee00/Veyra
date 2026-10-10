@@ -1,0 +1,75 @@
+"use client";
+import { useState } from "react";
+import DraggablePageCanvas from "@/components/builder/DraggablePageCanvas";
+import { pageDocumentIsValid } from "@/platform/builder/page-model";
+import type { PageDocument, PageBlockKind } from "@/platform/builder/page-model";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import type { BuilderNode } from "@/platform/builder/block-catalog";
+import { validateBuilderTree } from "@/platform/builder/block-catalog";
+const supported=["heading","paragraph","button","divider"] as const;
+type Kind=typeof supported[number];
+function createBlock(type:Kind):BuilderNode{return{id:crypto.randomUUID(),type,props:type==="heading"?{text:"New heading"}:type==="paragraph"?{text:"Describe what makes your work special."}:type==="button"?{text:"Get in touch",url:"/"}:{},children:[]};}
+const SECTION_PRESETS = [
+ {id:"hero",label:"Hero / Introduction",elements:[["heading","Welcome to my world"],["paragraph","Introduce what you do and who you help."],["button","Explore my work"]]},
+ {id:"services",label:"Services / Offerings",elements:[["heading","What I can help with"],["paragraph","Describe your real services, approach and what customers can expect."],["button","Request a quote"]]},
+ {id:"about",label:"About / Story",elements:[["heading","The story behind the work"],["paragraph","Share your experience, values and the people you serve."]]},
+ {id:"contact",label:"Contact / Call to action",elements:[["heading","Let's work together"],["paragraph","Tell visitors how to reach you and what happens next."],["button","Get in touch"]]},
+] as const;
+export default function PageBlockEditor({creatorId,initialBlocks,initialRevision,visible}:{creatorId:string;initialBlocks:unknown;initialRevision:number;visible:boolean}){
+ const initial=validateBuilderTree(initialBlocks)&&initialBlocks.every(x=>supported.includes(x.type as Kind))?initialBlocks:[];
+ const [blocks,setBlocks]=useState<BuilderNode[]>(initial);
+ const [selectedId,setSelectedId]=useState<string|null>(null);
+ const [saved,setSaved]=useState(JSON.stringify(initial));
+ const [revision,setRevision]=useState(initialRevision);
+ const [history,setHistory]=useState<BuilderNode[][]>([]);
+ const [future,setFuture]=useState<BuilderNode[][]>([]);
+ const [busy,setBusy]=useState(false);const [status,setStatus]=useState("");
+ function change(next:BuilderNode[]){setHistory(h=>[...h.slice(-19),blocks]);setFuture([]);setBlocks(next);setStatus("");}
+ function undo(){if(!history.length)return;setFuture(f=>[blocks,...f]);setBlocks(history.at(-1)!);setHistory(h=>h.slice(0,-1));}
+ function redo(){if(!future.length)return;setHistory(h=>[...h,blocks]);setBlocks(future[0]);setFuture(f=>f.slice(1));}
+ function addPreset(preset:typeof SECTION_PRESETS[number]){
+  const next: BuilderNode[]=preset.elements.map(([kind,text]): BuilderNode=>{
+   const props: BuilderNode["props"]=kind==="button"?{text,url:"/"}:{text};
+   return {...createBlock(kind),props};
+  });
+  if(blocks.length+next.length>40){setStatus("Your page has reached the 40-block limit.");return;}
+  change([...blocks,...next]);
+ }
+ function moveTo(from:number,to:number){
+  if(from<0||to<0||from>=blocks.length||to>=blocks.length||from===to)return;
+  const next=[...blocks];const [moving]=next.splice(from,1);next.splice(to,0,moving);
+  change(next);
+ }
+ function insertAt(type:Kind,index:number) {
+  if(blocks.length>=40)return;
+  const node=createBlock(type);
+  const next=[...blocks];
+  next.splice(Math.max(0,Math.min(index,blocks.length)),0,node);
+  change(next);setSelectedId(node.id);
+ }
+ function selectForEdit(id:string){
+  setSelectedId(id);
+  document.getElementById(`homepage-block-${id}`)?.scrollIntoView({behavior:"smooth",block:"center"});
+ }
+ function move(index:number,by:number){const to=index+by;if(to<0||to>=blocks.length)return;const next=[...blocks];[next[index],next[to]]=[next[to],next[index]];change(next);}
+ async function save(publish:boolean){
+  setBusy(true);setStatus("");
+  try{
+   if(!validateBuilderTree(blocks)||blocks.some(b=>!supported.includes(b.type as Kind)))throw new Error("Unsupported page block.");
+   const db=createSupabaseBrowserClient();
+   const {data:{user}}=await db.auth.getUser();if(!user)throw new Error("Please sign in.");
+   const {data:owner}=await db.from("creator_accounts").select("id").eq("owner_user_id",user.id).eq("id",creatorId).maybeSingle();if(!owner)throw new Error("You cannot edit this website.");
+   const {data:newRevision,error}=await db.rpc("veyra_save_homepage_draft",{target_creator:creatorId,expected_revision:revision,next_blocks:blocks});if(error)throw error;
+   setRevision(newRevision as number);
+   setSaved(JSON.stringify(blocks));
+   if(publish){const {error:publishError}=await db.rpc("veyra_publish_builder",{target_creator:creatorId,expected_revision:newRevision});if(publishError)throw publishError;}
+   setStatus(publish?"Your page sections are now live.":"Draft saved privately.");
+  }catch(e){setStatus(e instanceof Error?e.message:"Could not save.");}finally{setBusy(false);}
+ }
+ return <section className="veyra-block-editor" aria-label="Page sections editor">
+  <div className="veyra-block-heading"><div><p className="eyebrow">PAGE COMPOSER / BETA</p><h2>Build your homepage.</h2><p>Add real text and links, arrange sections and preview before publishing. More sections and pages are being developed.</p></div><div className="veyra-block-actions"><button onClick={undo} disabled={!history.length||busy}>Undo</button><button onClick={redo} disabled={!future.length||busy}>Redo</button><button onClick={()=>save(false)} disabled={busy||JSON.stringify(blocks)===saved}>Save draft</button><button onClick={()=>save(true)} disabled={busy||!visible}>Publish sections</button></div></div>
+  <div className="veyra-block-workspace"><aside><h3>Add an element</h3>{supported.map(type=><button key={type} draggable={blocks.length<40&&!busy} onDragStart={event=>{event.dataTransfer.setData("application/x-veyra-block",type);event.dataTransfer.effectAllowed="copy";}} disabled={blocks.length>=40||busy} title="Drag to the preview or tap to add" onClick={()=>change([...blocks,createBlock(type)])}>⠿ + {type==="paragraph"?"Text":type[0].toUpperCase()+type.slice(1)}</button>)}<h3>Ready-made sections</h3>{SECTION_PRESETS.map(preset=><button key={preset.id} onClick={()=>addPreset(preset)} disabled={blocks.length+preset.elements.length>40}>+ {preset.label}</button>)}<small>Up to 40 blocks. Presets add editable content rather than fake data or nonworking integrations.</small></aside>
+  <div className="veyra-block-list">{!blocks.length&&<p className="veyra-block-empty">Your canvas is empty. Choose an element to begin.</p>}{blocks.map((block,i)=><article key={block.id} id={`homepage-block-${block.id}`} className={`veyra-block-item ${selectedId===block.id?"selected":""}`}><div className="veyra-block-toolbar"><strong>{i+1}. {block.type}</strong><div><button aria-label="Move up" disabled={i===0} onClick={()=>move(i,-1)}>↑</button><button aria-label="Move down" disabled={i===blocks.length-1} onClick={()=>move(i,1)}>↓</button><button aria-label="Duplicate block" disabled={blocks.length>=40} onClick={()=>change([...blocks.slice(0,i+1),{...block,id:crypto.randomUUID()},...blocks.slice(i+1)])}>Copy</button><button aria-label="Remove block" onClick={()=>change(blocks.filter(b=>b.id!==block.id))}>Remove</button></div></div>{block.type!=="divider"&&<label>Content<input value={String(block.props.text??"")} maxLength={5000} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,text:e.target.value}}:b))}/></label>}{block.type==="button"&&<label>Link (https:// or internal /path)<input value={String(block.props.url??"")} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,url:e.target.value}}:b))}/></label>}</article>)}<div className="veyra-block-canvas" aria-label="Live content preview"><strong>LIVE DRAFT PREVIEW</strong>{pageDocumentIsValid(blocks) ? <DraggablePageCanvas blocks={blocks as PageDocument} selectedId={selectedId} siteBasePath="/" busy={busy} onSelect={selectForEdit} onMove={moveTo} onInsert={(kind:PageBlockKind,index)=>{if(supported.includes(kind as Kind))insertAt(kind as Kind,index);}}/> : <p role="alert">These draft blocks need review before visual dragging is available. Edit their content fields and save again.</p>}</div></div></div>
+  {status&&<p role="status" className="form-message">{status}</p>}{!visible&&<p className="visual-builder-warning">Publish your website from Profile before applying page sections.</p>}
+ </section>;
+}
