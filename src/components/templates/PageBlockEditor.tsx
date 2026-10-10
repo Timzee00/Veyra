@@ -1,5 +1,8 @@
 "use client";
 import { useState } from "react";
+import DraggablePageCanvas from "@/components/builder/DraggablePageCanvas";
+import { pageDocumentIsValid } from "@/platform/builder/page-model";
+import type { PageDocument, PageBlockKind } from "@/platform/builder/page-model";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import type { BuilderNode } from "@/platform/builder/block-catalog";
 import { validateBuilderTree } from "@/platform/builder/block-catalog";
@@ -15,6 +18,7 @@ const SECTION_PRESETS = [
 export default function PageBlockEditor({creatorId,initialBlocks,initialRevision,visible}:{creatorId:string;initialBlocks:unknown;initialRevision:number;visible:boolean}){
  const initial=validateBuilderTree(initialBlocks)&&initialBlocks.every(x=>supported.includes(x.type as Kind))?initialBlocks:[];
  const [blocks,setBlocks]=useState<BuilderNode[]>(initial);
+ const [selectedId,setSelectedId]=useState<string|null>(null);
  const [saved,setSaved]=useState(JSON.stringify(initial));
  const [revision,setRevision]=useState(initialRevision);
  const [history,setHistory]=useState<BuilderNode[][]>([]);
@@ -30,6 +34,22 @@ export default function PageBlockEditor({creatorId,initialBlocks,initialRevision
   });
   if(blocks.length+next.length>40){setStatus("Your page has reached the 40-block limit.");return;}
   change([...blocks,...next]);
+ }
+ function moveTo(from:number,to:number){
+  if(from<0||to<0||from>=blocks.length||to>=blocks.length||from===to)return;
+  const next=[...blocks];const [moving]=next.splice(from,1);next.splice(to,0,moving);
+  change(next);
+ }
+ function insertAt(type:Kind,index:number) {
+  if(blocks.length>=40)return;
+  const node=createBlock(type);
+  const next=[...blocks];
+  next.splice(Math.max(0,Math.min(index,blocks.length)),0,node);
+  change(next);setSelectedId(node.id);
+ }
+ function selectForEdit(id:string){
+  setSelectedId(id);
+  document.getElementById(`homepage-block-${id}`)?.scrollIntoView({behavior:"smooth",block:"center"});
  }
  function move(index:number,by:number){const to=index+by;if(to<0||to>=blocks.length)return;const next=[...blocks];[next[index],next[to]]=[next[to],next[index]];change(next);}
  async function save(publish:boolean){
@@ -48,8 +68,8 @@ export default function PageBlockEditor({creatorId,initialBlocks,initialRevision
  }
  return <section className="veyra-block-editor" aria-label="Page sections editor">
   <div className="veyra-block-heading"><div><p className="eyebrow">PAGE COMPOSER / BETA</p><h2>Build your homepage.</h2><p>Add real text and links, arrange sections and preview before publishing. More sections and pages are being developed.</p></div><div className="veyra-block-actions"><button onClick={undo} disabled={!history.length||busy}>Undo</button><button onClick={redo} disabled={!future.length||busy}>Redo</button><button onClick={()=>save(false)} disabled={busy||JSON.stringify(blocks)===saved}>Save draft</button><button onClick={()=>save(true)} disabled={busy||!visible}>Publish sections</button></div></div>
-  <div className="veyra-block-workspace"><aside><h3>Add an element</h3>{supported.map(type=><button key={type} disabled={blocks.length>=40} onClick={()=>change([...blocks,createBlock(type)])}>+ {type==="paragraph"?"Text":type[0].toUpperCase()+type.slice(1)}</button>)}<h3>Ready-made sections</h3>{SECTION_PRESETS.map(preset=><button key={preset.id} onClick={()=>addPreset(preset)} disabled={blocks.length+preset.elements.length>40}>+ {preset.label}</button>)}<small>Up to 40 blocks. Presets add editable content rather than fake data or nonworking integrations.</small></aside>
-  <div className="veyra-block-list">{!blocks.length&&<p className="veyra-block-empty">Your canvas is empty. Choose an element to begin.</p>}{blocks.map((block,i)=><article key={block.id} className="veyra-block-item"><div className="veyra-block-toolbar"><strong>{i+1}. {block.type}</strong><div><button aria-label="Move up" disabled={i===0} onClick={()=>move(i,-1)}>↑</button><button aria-label="Move down" disabled={i===blocks.length-1} onClick={()=>move(i,1)}>↓</button><button aria-label="Duplicate block" disabled={blocks.length>=40} onClick={()=>change([...blocks.slice(0,i+1),{...block,id:crypto.randomUUID()},...blocks.slice(i+1)])}>Copy</button><button aria-label="Remove block" onClick={()=>change(blocks.filter(b=>b.id!==block.id))}>Remove</button></div></div>{block.type!=="divider"&&<label>Content<input value={String(block.props.text??"")} maxLength={5000} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,text:e.target.value}}:b))}/></label>}{block.type==="button"&&<label>Link (https:// or internal /path)<input value={String(block.props.url??"")} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,url:e.target.value}}:b))}/></label>}</article>)}<div className="veyra-block-canvas" aria-label="Live content preview"><strong>LIVE DRAFT PREVIEW</strong>{blocks.map(block=><div key={block.id}>{block.type==="heading"?<h2>{String(block.props.text??"")}</h2>:block.type==="paragraph"?<p>{String(block.props.text??"")}</p>:block.type==="button"?<span className="veyra-block-preview-button">{String(block.props.text??"Button")} ↗</span>:<hr/>}</div>)}</div></div></div>
+  <div className="veyra-block-workspace"><aside><h3>Add an element</h3>{supported.map(type=><button key={type} draggable={blocks.length<40&&!busy} onDragStart={event=>{event.dataTransfer.setData("application/x-veyra-block",type);event.dataTransfer.effectAllowed="copy";}} disabled={blocks.length>=40||busy} title="Drag to the preview or tap to add" onClick={()=>change([...blocks,createBlock(type)])}>⠿ + {type==="paragraph"?"Text":type[0].toUpperCase()+type.slice(1)}</button>)}<h3>Ready-made sections</h3>{SECTION_PRESETS.map(preset=><button key={preset.id} onClick={()=>addPreset(preset)} disabled={blocks.length+preset.elements.length>40}>+ {preset.label}</button>)}<small>Up to 40 blocks. Presets add editable content rather than fake data or nonworking integrations.</small></aside>
+  <div className="veyra-block-list">{!blocks.length&&<p className="veyra-block-empty">Your canvas is empty. Choose an element to begin.</p>}{blocks.map((block,i)=><article key={block.id} id={`homepage-block-${block.id}`} className={`veyra-block-item ${selectedId===block.id?"selected":""}`}><div className="veyra-block-toolbar"><strong>{i+1}. {block.type}</strong><div><button aria-label="Move up" disabled={i===0} onClick={()=>move(i,-1)}>↑</button><button aria-label="Move down" disabled={i===blocks.length-1} onClick={()=>move(i,1)}>↓</button><button aria-label="Duplicate block" disabled={blocks.length>=40} onClick={()=>change([...blocks.slice(0,i+1),{...block,id:crypto.randomUUID()},...blocks.slice(i+1)])}>Copy</button><button aria-label="Remove block" onClick={()=>change(blocks.filter(b=>b.id!==block.id))}>Remove</button></div></div>{block.type!=="divider"&&<label>Content<input value={String(block.props.text??"")} maxLength={5000} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,text:e.target.value}}:b))}/></label>}{block.type==="button"&&<label>Link (https:// or internal /path)<input value={String(block.props.url??"")} onChange={e=>change(blocks.map(b=>b.id===block.id?{...b,props:{...b.props,url:e.target.value}}:b))}/></label>}</article>)}<div className="veyra-block-canvas" aria-label="Live content preview"><strong>LIVE DRAFT PREVIEW</strong>{pageDocumentIsValid(blocks) ? <DraggablePageCanvas blocks={blocks as PageDocument} selectedId={selectedId} siteBasePath="/" busy={busy} onSelect={selectForEdit} onMove={moveTo} onInsert={(kind:PageBlockKind,index)=>{if(supported.includes(kind as Kind))insertAt(kind as Kind,index);}}/> : <p role="alert">These draft blocks need review before visual dragging is available. Edit their content fields and save again.</p>}</div></div></div>
   {status&&<p role="status" className="form-message">{status}</p>}{!visible&&<p className="visual-builder-warning">Publish your website from Profile before applying page sections.</p>}
  </section>;
 }
