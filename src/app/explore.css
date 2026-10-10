@@ -6,3 +6,5 @@
 @media(max-width:1000px){.discover-site-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.public-profile-project-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.discover-site-grid,.public-profile-project-grid{grid-template-columns:1fr}.discover-top-row{align-items:flex-start;flex-direction:column}.discover-site-art{min-height:220px}.discover-sort{margin-left:0;width:100%}.discover-outro{padding:35px 20px!important}.discover-group-heading{align-items:start;flex-direction:column}.public-profile-hero{padding-top:45px}}
 @media(prefers-reduced-motion:reduce){.discover-site-card,.discover-category-strip a{transition:none}.discover-site-card:hover,.discover-category-strip a:hover{transform:none}}
+
+.public-profile-avatar{overflow:hidden}.veyra-public-avatar{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit}
