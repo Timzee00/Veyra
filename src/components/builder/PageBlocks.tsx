@@ -20,5 +20,12 @@ function RenderBlock({ block, siteBasePath }: { block: PageBlock; siteBasePath?:
 
 export default function PageBlocks({ blocks, className = "", siteBasePath }: { blocks: PageDocument | unknown; className?: string; siteBasePath?: string }) {
   if (!pageDocumentIsValid(blocks)) return null;
-  return <div className={`veyra-page-content ${className}`}>{blocks.map(block => <div className={`vpage-block vpage-block-${block.type}`} key={block.id}><RenderBlock block={block} siteBasePath={siteBasePath} /></div>)}</div>;
+  return <div className={`veyra-page-content ${className}`}>{blocks.map(block => {
+    const align = block.props.align || "left";
+    const width = block.props.width || "full";
+    const tone = block.props.tone || "plain";
+    return <div className={`vpage-block vpage-block-${block.type} vpage-block-align-${align} vpage-block-width-${width} vpage-block-tone-${tone}`} key={block.id}>
+      <RenderBlock block={block} siteBasePath={siteBasePath} />
+    </div>;
+  })}</div>;
 }
