@@ -253,7 +253,19 @@ export default function SitePageStudio({ page, creatorHandle, siteLive, publishe
         {selected.type!=="spacer"&&selected.type!=="divider"&&selected.type!=="faq"&&selected.type!=="image"&&<label>Text<textarea rows={4} value={String(selected.props.text??"")} maxLength={4000} onChange={e=>updateProp("text",e.target.value)} /></label>}
         {(selected.type==="button"||selected.type==="image")&&<label>{selected.type==="image"?"Image address (HTTPS)":"Destination URL"}<input value={String(selected.props.url??"")} maxLength={4000} onChange={e=>updateProp("url",e.target.value)}/></label>}
         {selected.type==="image"&&<label>Image description for accessibility<input value={String(selected.props.alt??"")} maxLength={220} onChange={e=>updateProp("alt",e.target.value)}/></label>}{selected.type==="image"&&<CreatorImageLibrary creatorId={page.creator_id} compact label="Use in this image block" onSelect={(url,_path,alt)=>{edit(blocks.map(item=>item.id===selected.id?{...item,props:{...item.props,url,alt:item.props.alt||alt}}:item));setMessage("Image added. Save your draft to keep it.");}}/>}
-        {selected.type==="faq"&&<><label>Question<input value={String(selected.props.question??"")} onChange={e=>updateProp("question",e.target.value)}/></label><label>Answer<textarea rows={4} value={String(selected.props.answer??"")} onChange={e=>updateProp("answer",e.target.value)}/></label></>}
+        {selected.type==="faq"&&<><label>Question<input value={String(selected.props.question??"")} onChange={e=>updateProp("question",e.target.value)}/></label><label>Answer<textarea rows={4} value={String(selected.props.answer??"")} onChange={e=>updateProp("answer",e.target.value)}/></label></>}<div className="vstudio-visual-controls">
+        <h3>Visual styling</h3>
+        <label>Text alignment<select value={String(selected.props.align??"left")} onChange={event=>updateProp("align",event.target.value)}>
+          <option value="left">Left</option><option value="center">Centered</option><option value="right">Right</option>
+        </select></label>
+        <label>Element width<select value={String(selected.props.width??"full")} onChange={event=>updateProp("width",event.target.value)}>
+          <option value="full">Full width</option><option value="medium">Medium</option><option value="narrow">Narrow</option>
+        </select></label>
+        <label>Background emphasis<select value={String(selected.props.tone??"plain")} onChange={event=>updateProp("tone",event.target.value)}>
+          <option value="plain">Clean</option><option value="soft">Soft highlight</option><option value="accent">Strong accent</option>
+        </select></label>
+        <p>Changes update the canvas immediately and remain private until saved or published.</p>
+      </div>
         {(selected.type==="spacer"||selected.type==="divider")&&<p>This element adds spacing or separates sections without needing text.</p>}
         </>:<p>Select an element from Layers to edit its content.</p>}
         <div className="vstudio-guidance"><h3>Publishing checklist</h3><p>Ensure text is accurate, buttons have valid links, and any uploaded images have helpful descriptions. Review all screen widths before publishing.</p>
