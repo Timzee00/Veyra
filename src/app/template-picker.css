@@ -41,3 +41,13 @@
 .veyra-block-canvas p{font-size:15px;line-height:1.75;max-width:620px;margin:0;color:#595367}
 .veyra-block-preview-button{display:inline-flex;background:#2b2046;color:#fff;border-radius:999px;padding:13px 20px;font-size:13px}
 .veyra-block-canvas hr{border:0;border-top:1px solid #d4ceda;margin:7px 0}
+
+/* Homepage studio uses the same drag handles as the standalone page canvas. */
+.veyra-block-canvas .vstudio-drag-canvas{padding:0;gap:13px}
+.veyra-block-canvas .vstudio-editable-controls button{background:#3a285b;color:#fff;border:1px solid #8c74af;border-radius:8px;min-height:38px;padding:7px 12px;font-size:11px;cursor:pointer}
+.veyra-block-canvas .vstudio-editable-controls .vstudio-drag-handle{touch-action:none;cursor:grab}
+.veyra-block-canvas .vstudio-editable-controls button:focus-visible{outline:3px solid #7a5fc1;outline-offset:3px}
+.veyra-block-canvas .vstudio-editable-content{pointer-events:none}
+.veyra-block-item.selected{border-color:#bb9feb;box-shadow:0 0 0 2px #bb9feb35}
+.veyra-block-canvas .vstudio-editable-content .vpage-paragraph{font-size:15px;line-height:1.7}
+.veyra-block-canvas .vstudio-editable-content .vpage-cta{font-size:13px}
