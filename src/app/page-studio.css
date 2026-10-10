@@ -171,3 +171,21 @@
  .vstudio .vstudio-editable-controls button{min-height:40px}
 }
 @media(prefers-reduced-motion:reduce){.vstudio-editable-block{transition:none}}
+
+/* Per-block visual styling, shared by studio canvas and published pages. */
+.vpage-block-width-medium{width: min(100%,700px)}
+.vpage-block-width-narrow{width: min(100%,440px)}
+.vpage-block-align-left{text-align:left}
+.vpage-block-align-center{text-align:center;margin-inline:auto}
+.vpage-block-align-center .vpage-paragraph{margin-inline:auto}
+.vpage-block-align-center .vpage-figure img{margin-inline:auto}
+.vpage-block-align-right{text-align:right;margin-left:auto}
+.vpage-block-align-right .vpage-paragraph{margin-left:auto}
+.vpage-block-tone-soft{background:rgba(132,102,189,.09);border:1px solid rgba(132,102,189,.15);padding:20px;border-radius:14px}
+.vpage-block-tone-accent{background:#34264d;color:#f9f5ff;padding:24px;border-radius:14px}
+.vpage-block-tone-accent .vpage-cta{background:#f7ecff;color:#241734}
+.vpage-block-tone-accent .vpage-faq{color:#f9f5ff}
+.vstudio-inspector select{width:100%;min-width:0;border:1px solid #ffffff29;background:#181d2d;color:#fff;border-radius:9px;padding:12px;font:inherit;font-size:13px;min-height:45px}
+.vstudio-visual-controls{display:grid;gap:12px;border-top:1px solid #ffffff30;padding-top:14px;margin-top:12px}
+.vstudio-visual-controls h3{margin:0;font-size:15px}
+.vstudio-visual-controls p{font-size:11px;color:#c5b7d3;line-height:1.65}
